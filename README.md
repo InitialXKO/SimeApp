@@ -4,6 +4,26 @@ SimeApp 包含是语输入法的 Android、macOS 和 Fcitx5 前端。C++ 输入�
 工具及模型训练流水线位于独立的
 [Sime](https://github.com/Ismantic/Sime) 仓库。
 
+## 安装
+
+### Arch Linux
+
+是语输入法已经发布到
+[AUR](https://aur.archlinux.org/packages/fcitx5-sime)。使用 `yay` 安装：
+
+```bash
+yay -S fcitx5-sime
+```
+
+安装完成后重启 Fcitx5：
+
+```bash
+fcitx5 -r
+```
+
+打开 `fcitx5-configtool`，搜索并添加“Sime”，随后即可切换使用。后续版本会随
+常规的 `yay -Syu` 一起更新。
+
 ## 目录
 
 - `Android/`：Android IME、JNI 适配层及 JUnit 测试。
@@ -26,7 +46,7 @@ Shiyu/
 `SIME_ENGINE_ROOT`，或向 CMake 传入
 `-DSIME_ENGINE_ROOT=/path/to/Sime`。
 
-## 构建
+## 从源码构建
 
 Android：
 

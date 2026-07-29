@@ -2,12 +2,14 @@
 
 将 Sime 拼音引擎集成到 Fcitx5 输入法框架。
 
-## 打包安装 (Arch Linux)
+## Arch Linux
 
 ```bash
-cd Linux/package
-makepkg -si
+yay -S fcitx5-sime
+fcitx5 -r
 ```
+
+安装后打开 `fcitx5-configtool`，搜索并添加“Sime”。
 
 ## 手动编译安装
 
@@ -25,10 +27,10 @@ fcitx5 -r  # 重启 fcitx5
 ## 编译依赖
 
 - fcitx5 >= 5.0
-- extra-cmake-modules
+- CMake >= 3.20
+- 支持 C++20 的编译器
 
 ## 使用
 
 1. 在 fcitx5-configtool 中添加 "Sime" 输入法
 2. 切换到 Sime，输入拼音，数字键或空格选词
-
