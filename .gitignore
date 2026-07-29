@@ -22,3 +22,33 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+# Repository builds
+/build/
+
+# Android local configuration and outputs
+/Android/.gradle/
+/Android/build/
+/Android/app/build/
+/Android/app/.cxx/
+/Android/local.properties
+/Android/keystore.properties
+/Android/**/*.jks
+/Android/**/*.keystore
+/Android/app/src/main/assets/sime.cnt
+/Android/app/src/main/assets/sime.dict
+
+# Desktop build and package outputs
+/macOS/build/
+/macOS/package/dist/
+/macOS/package/payload/
+/Linux/package/src/
+/Linux/package/pkg/
+/Linux/package/*.pkg.tar.zst
+
+# Locally retained release artifacts
+/releases/
+
+# Runtime language models
+*.cnt
+*.dict
