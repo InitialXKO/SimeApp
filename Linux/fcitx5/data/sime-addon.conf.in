@@ -14,4 +14,3 @@ Configurable=True
 [Addon/OptionalDependencies]
 0=fullwidth
 1=chttrans
-2=punctuation

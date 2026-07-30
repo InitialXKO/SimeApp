@@ -95,10 +95,14 @@ public:
     // Punctuation undo
     bool lastIsPunc = false;
     std::string lastPuncStr;
+    bool doubleQuoteOpen = true;
+    bool singleQuoteOpen = true;
 
     void resetPuncState() {
         lastIsPunc = false;
         lastPuncStr.clear();
+        doubleQuoteOpen = true;
+        singleQuoteOpen = true;
     }
 };
 
