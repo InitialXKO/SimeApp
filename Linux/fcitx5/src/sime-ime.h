@@ -12,7 +12,6 @@
 #include <fcitx/inputcontextproperty.h>
 #include <fcitx/inputmethodengine.h>
 #include <fcitx/instance.h>
-#include <fcitx-module/punctuation/punctuation_public.h>
 #include <memory>
 #include <vector>
 
@@ -143,7 +142,6 @@ private:
 
     FCITX_ADDON_DEPENDENCY_LOADER(fullwidth, instance_->addonManager());
     FCITX_ADDON_DEPENDENCY_LOADER(chttrans, instance_->addonManager());
-    FCITX_ADDON_DEPENDENCY_LOADER(punctuation, instance_->addonManager());
 };
 
 class SimeAddonFactory : public AddonFactory {

@@ -1,6 +1,7 @@
 // Sime Fcitx5 Engine
 
 #include "sime-ime.h"
+#include <cstdint>
 #include <cstdlib>
 #include <filesystem>
 #include <fcitx-utils/key.h>
@@ -47,6 +48,44 @@ std::vector<sime::TokenID> decodeContext(const SimeState *st) {
         context.insert(context.end(), sel.tokens.begin(), sel.tokens.end());
     }
     return context;
+}
+
+std::string punctuationOutput(uint32_t chr, SimeState *st) {
+    switch (chr) {
+    case ',': return "，";
+    case '.': return "。";
+    case '?': return "？";
+    case '!': return "！";
+    case ';': return "；";
+    case ':': return "：";
+    case '\\': return "、";
+    case '(': return "（";
+    case ')': return "）";
+    case '<': return "《";
+    case '>': return "》";
+    case '[': return "【";
+    case ']': return "】";
+    case '{': return "「";
+    case '}': return "」";
+    case '$': return "￥";
+    case '^': return "……";
+    case '_': return "——";
+    case '@': return "＠";
+    case '#': return "＃";
+    case '&': return "＆";
+    case '~': return "～";
+    case '"': {
+        const auto result = st->doubleQuoteOpen ? "“" : "”";
+        st->doubleQuoteOpen = !st->doubleQuoteOpen;
+        return result;
+    }
+    case '\'': {
+        const auto result = st->singleQuoteOpen ? "‘" : "’";
+        st->singleQuoteOpen = !st->singleQuoteOpen;
+        return result;
+    }
+    default: return {};
+    }
 }
 }  // namespace
 
@@ -148,9 +187,9 @@ void Sime::activate(const InputMethodEntry &, InputContextEvent &event) {
     fullwidth();
     chttrans();
 
-    // Add status area actions (fullwidth, punctuation, chttrans toggles)
+    // Add status area actions supplied by optional addons.
     auto *ic = event.inputContext();
-    for (const auto *actionName : {"chttrans", "punctuation", "fullwidth"}) {
+    for (const auto *actionName : {"chttrans", "fullwidth"}) {
         if (auto *action =
                 instance_->userInterfaceManager().lookupAction(actionName)) {
             ic->statusArea().addAction(StatusGroup::InputMethod, action);
@@ -688,54 +727,26 @@ void Sime::keyEvent(const InputMethodEntry &, KeyEvent &event) {
         }
     }
 
-    // Punctuation (via punctuation addon)
-    if (!key.hasModifier() && !key.isKeyPad() && punctuation()) {
+    // Chinese punctuation.
+    if (!key.hasModifier() && !key.isKeyPad()) {
         auto chr = Key::keySymToUnicode(key.sym());
-        if (chr) {
-            auto [punc, puncAfter] =
-                punctuation()->call<IPunctuation::pushPunctuationV2>(
-                    "zh_CN", ic, chr);
-
-            if (!punc.empty()) {
-                // Auto-select first candidate if composing
-                if (!st->empty() && cl && cl->size() > 0) {
-                    cl->candidate(0).select(ic);
-                }
-
-                // Commit punctuation with paired cursor placement
-                auto paired = punc + puncAfter;
-                if (!puncAfter.empty()) {
-                    if (ic->capabilityFlags().test(
-                            CapabilityFlag::CommitStringWithCursor)) {
-                        auto len = utf8::lengthValidated(punc);
-                        if (len != utf8::INVALID_LENGTH) {
-                            ic->commitStringWithCursor(paired, len);
-                        } else {
-                            ic->commitString(paired);
-                        }
-                    } else {
-                        ic->commitString(paired);
-                        auto afterLen = utf8::lengthValidated(puncAfter);
-                        if (afterLen != utf8::INVALID_LENGTH) {
-                            for (size_t i = 0; i < afterLen; i++) {
-                                ic->forwardKey(Key(FcitxKey_Left));
-                            }
-                        }
-                    }
-                } else {
-                    ic->commitString(punc);
-                }
-
-                st->lastIsPunc = true;
-                st->lastPuncStr = paired;
-
-                // Sentence-ending punctuation clears context
-                if (punc == "。" || punc == "？" || punc == "！") {
-                    st->clearContext();
-                }
-                event.filterAndAccept();
-                return;
+        if (auto punc = punctuationOutput(chr, st); !punc.empty()) {
+            // Auto-select first candidate if composing
+            if (!st->empty() && cl && cl->size() > 0) {
+                cl->candidate(0).select(ic);
             }
+
+            ic->commitString(punc);
+
+            st->lastIsPunc = true;
+            st->lastPuncStr = punc;
+
+            // Sentence-ending punctuation clears context
+            if (punc == "。" || punc == "？" || punc == "！") {
+                st->clearContext();
+            }
+            event.filterAndAccept();
+            return;
         }
     }
 }
