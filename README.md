@@ -35,7 +35,7 @@ fcitx5 -r
 - `Linux/package/`：Arch Linux 打包文件。
 - `cmake/`：定位并引入 Sime 引擎的共享 CMake 模块。
 
-## 获取源码
+## 源码
 
 开发时推荐把两个仓库放在同一目录：
 
@@ -49,7 +49,7 @@ Shiyu/
 `SIME_ENGINE_ROOT`，或向 CMake 传入
 `-DSIME_ENGINE_ROOT=/path/to/Sime`。
 
-## 从源码构建
+## 构建
 
 如果你想自己编译或修改代码，可以从源码构建。
 
