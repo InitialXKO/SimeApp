@@ -32,6 +32,13 @@ import java.util.List;
  * <p>Idle: {@code ⚙ ... ∨}. Active: {@code [preedit]  hanzi hanzi ...  ∨}.
  */
 public class CandidatesBar extends FrameLayout {
+    /**
+     * Keep the horizontally scrolling strip bounded. The decoder can return
+     * close to 200 T9 Layer-2 alternatives; binding all of them on every key
+     * delays the next frame even though only a handful fit on screen. The
+     * expanded candidate grid still receives the complete list.
+     */
+    private static final int MAX_STRIP_CANDIDATES = 24;
 
     /**
      * Single listener for all bar events. Default no-op methods so each
@@ -403,7 +410,8 @@ public class CandidatesBar extends FrameLayout {
                                     String englishBuffer) {
         boolean hasBufferCell = englishStyle && englishBuffer != null
                 && !englishBuffer.isEmpty();
-        int candCount = candidates == null ? 0 : candidates.size();
+        int candCount = candidates == null
+                ? 0 : Math.min(candidates.size(), MAX_STRIP_CANDIDATES);
         int totalCells = candCount + (hasBufferCell ? 1 : 0);
         this.activeCandidateCount = totalCells;
 
