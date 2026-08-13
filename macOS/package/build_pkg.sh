@@ -30,6 +30,11 @@ cp -R "$ROOT/resources/zh_CN.lproj" "$RES/"
 cp    "$ROOT/resources/sime.tiff"   "$RES/"
 cp    "$ENGINE_ROOT/pipeline/output/sime.cnt"  "$RES/"
 cp    "$ENGINE_ROOT/pipeline/output/sime.dict" "$RES/"
+cp    "$ENGINE_ROOT/pipeline/output/gru.embedding.i8" "$RES/"
+cp    "$ENGINE_ROOT/pipeline/output/gru.pinyin.ncnn.param" "$RES/"
+cp    "$ENGINE_ROOT/pipeline/output/gru.pinyin.ncnn.bin" "$RES/"
+cp    "$ENGINE_ROOT/pipeline/output/gru.t9.ncnn.param" "$RES/"
+cp    "$ENGINE_ROOT/pipeline/output/gru.t9.ncnn.bin" "$RES/"
 
 echo ">> Ad-hoc codesign"
 codesign --force --deep --sign - "$APP_BUILT" >/dev/null

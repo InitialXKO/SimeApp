@@ -7,6 +7,11 @@ SimeApp 包含是语输入法的 Android、macOS 和 Fcitx5 前端。C++ 输入�
 ## 安装
 
 - Android 和 macOS 的正式版本可以直接去 [Release 页面](https://github.com/Ismantic/SimeApp/releases) 下载。
+
+## 0.16.0
+
+- 新增本地 GRU 整句排序器，提升全拼和九宫格整句准确率；模型完全离线运行。
+- 保留此前的九宫格解码延迟优化，GRU 使用单线程 ncnn CPU 推理。
 - Arch Linux 可以直接安装 [AUR](https://aur.archlinux.org/packages/fcitx5-sime) 包。
 - 开发或自行编译时，请从源码构建。
 

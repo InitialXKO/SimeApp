@@ -19,11 +19,18 @@ android {
         applicationId = "com.shiyu.sime"
         minSdk = 24
         targetSdk = 35
-        versionCode = 67
-        versionName = "0.15.4"
+        versionCode = 68
+        versionName = "0.16.0"
 
         ndk {
             abiFilters += listOf("arm64-v8a", "x86_64")
+        }
+        externalNativeBuild {
+            cmake {
+                arguments(
+                    "-DSIME_NCNN_SOURCE_DIR=${rootProject.layout.buildDirectory.get().asFile}/ncnn-20260526"
+                )
+            }
         }
     }
 

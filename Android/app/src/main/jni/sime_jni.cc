@@ -51,7 +51,8 @@ Java_com_shiyu_sime_SimeEngine_nativeLoadResources(
         g_sime.reset();
         return JNI_FALSE;
     }
-    LOGI("Resources loaded: trie=%s model=%s", trie.c_str(), model.c_str());
+    LOGI("Resources loaded: trie=%s model=%s gru=%s", trie.c_str(),
+         model.c_str(), g_sime->GruReady() ? "ready" : "disabled");
     return JNI_TRUE;
 }
 

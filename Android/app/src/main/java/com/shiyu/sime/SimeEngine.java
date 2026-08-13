@@ -32,7 +32,7 @@ public class SimeEngine {
      * a marker file with the version it was extracted from; mismatches
      * trigger a re-extract on the next {@link #start(Context)}.
      */
-    private static final int ASSET_VERSION = 10;
+    private static final int ASSET_VERSION = 11;
     private static final String ASSET_VERSION_MARKER = ".deployed_version";
 
     private static boolean sLoaded = false;
@@ -257,12 +257,25 @@ public class SimeEngine {
             new File(dataDir, "sime.cnt").delete();
             new File(dataDir, "sime.ft.dict.txt").delete();
             new File(dataDir, "emoji.txt").delete();
+            new File(dataDir, "gru.embedding.i8").delete();
+            new File(dataDir, "gru.pinyin.ncnn.param").delete();
+            new File(dataDir, "gru.pinyin.ncnn.bin").delete();
+            new File(dataDir, "gru.t9.ncnn.param").delete();
+            new File(dataDir, "gru.t9.ncnn.bin").delete();
         }
         boolean trieOk    = extractAsset(ctx, "sime.dict", dataDir);
         boolean cntOk     = extractAsset(ctx, "sime.cnt",  dataDir);
         boolean ftOk      = extractAsset(ctx, "sime.ft.dict.txt", dataDir);
         boolean emojiOk   = extractAsset(ctx, "emoji.txt", dataDir);
-        if (trieOk && cntOk && ftOk && emojiOk && deployed != ASSET_VERSION) {
+        boolean gruEmbeddingOk = extractAsset(ctx, "gru.embedding.i8", dataDir);
+        boolean gruPinyinParamOk = extractAsset(ctx, "gru.pinyin.ncnn.param", dataDir);
+        boolean gruPinyinModelOk = extractAsset(ctx, "gru.pinyin.ncnn.bin", dataDir);
+        boolean gruT9ParamOk = extractAsset(ctx, "gru.t9.ncnn.param", dataDir);
+        boolean gruT9ModelOk = extractAsset(ctx, "gru.t9.ncnn.bin", dataDir);
+        boolean gruOk = gruEmbeddingOk && gruPinyinParamOk && gruPinyinModelOk
+                && gruT9ParamOk && gruT9ModelOk;
+        if (trieOk && cntOk && ftOk && emojiOk && gruOk
+                && deployed != ASSET_VERSION) {
             writeMarkerVersion(marker, ASSET_VERSION);
         }
     }

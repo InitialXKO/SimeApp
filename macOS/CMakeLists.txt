@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # ── Engine dependency ───────────────────────────────────────────────────────
 
 include(${CMAKE_CURRENT_LIST_DIR}/../cmake/SimeEngine.cmake)
+set(SIME_ENABLE_NCNN ON CACHE BOOL "Enable the GRU reranker" FORCE)
 simeapp_add_engine()
 
 # ── Source files ────────────────────────────────────────────────────────────
@@ -44,7 +45,8 @@ set_target_properties(SimeIME PROPERTIES
     MACOSX_BUNDLE_INFO_PLIST
         "${CMAKE_CURRENT_SOURCE_DIR}/resources/Info.plist"
     MACOSX_BUNDLE_BUNDLE_NAME "是语"
-    MACOSX_BUNDLE_BUNDLE_VERSION "1.0"
+    MACOSX_BUNDLE_BUNDLE_VERSION "0.16.0"
+    MACOSX_BUNDLE_SHORT_VERSION_STRING "0.16.0"
     MACOSX_BUNDLE_GUI_IDENTIFIER "com.sime.inputmethod.SimeIME"
 )
 

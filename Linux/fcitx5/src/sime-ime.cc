@@ -172,7 +172,8 @@ void Sime::initSime() {
     } else {
         sime_->LoadUserSentence(userSentencePath());
         sime_->SetUserSentenceEnabled(*config_.userSentence);
-        FCITX_INFO() << "Sime: resources loaded";
+        FCITX_INFO() << "Sime: resources loaded, GRU="
+                     << (sime_->GruReady() ? "ready" : "disabled");
     }
 }
 

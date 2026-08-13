@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/SimeEngine.cmake)
+set(SIME_ENABLE_NCNN ON CACHE BOOL "Enable the GRU reranker" FORCE)
 simeapp_add_engine()
 
 # 查找 Fcitx5
