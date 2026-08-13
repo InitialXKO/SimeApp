@@ -17,9 +17,9 @@ source=(
   "sime-model-${_enginever}.tar.zst::https://github.com/Ismantic/Sime/releases/download/v${_enginever}/sime-model-${_enginever}.tar.zst"
 )
 sha256sums=(
-  '0f32be757307d0c454be2e7b7ed0fd65d02b1b1a57a58c647e5d6a01d43b5a7a'
-  '99ada6fb8b3cebb6731412365f91f8cf7153cdd6f702a3b8c651d8bb73452ed7'
-  '61d3ab6e6f0be2e902b1fe10b54eacdead7baa70748bd2f30891eacb2e5d5fa6'
+  'd7b486e76fb7c2356bbd4a1c7f489744d5c951f4610762d83611e53605daea7b'
+  '5029e5da55f3a468e650d2add7c67e974e8228f227c767e2c942e149fb8f1c21'
+  '35ddd39724f252576be1de93a155b85aacd392f7f773966f4488b97c8f596d7c'
 )
 
 build() {
