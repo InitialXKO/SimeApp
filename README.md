@@ -17,11 +17,10 @@ SimeApp 包含是语输入法的 Android、macOS 和 Fcitx5 前端。C++ 输入�
 
 ### 准确率评测
 
-在固定的六集合 Top-1 测试中，加入 GRU 排序器后，Sime 的整句准确率从
+在固定测试集 Top-1 测试中，加入 GRU 排序器后，Sime 的整句准确率从
 **52.34% 提升到 57.41%**，字准确率从 **85.47% 提升到 87.75%**。其中三个
 全拼集合共 5,354 条，整句准确率为 **64.74%**，字准确率为 **91.89%**。
 
-<details>
 <summary>与一个公开 Rime 配置的同口径参考结果</summary>
 
 
@@ -38,7 +37,6 @@ SimeApp 包含是语输入法的 Android、macOS 和 Fcitx5 前端。C++ 输入�
 和已知限制见
 [完整报告](https://github.com/Ismantic/Sime/blob/main/pipeline/gru/RIME_ICE_EVALUATION.md)。
 
-</details>
 
 ### Arch Linux
 
