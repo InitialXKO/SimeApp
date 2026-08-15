@@ -228,9 +228,16 @@ public class CandidatesBar extends FrameLayout {
         boolean hasCandidates = (candidates != null) && !candidates.isEmpty();
         boolean hasEnglishInput = !snap.englishBuffer.isEmpty();
         boolean englishMode = snap.mode == KeyboardMode.ENGLISH;
+        boolean handwriting = snap.handwritingCandidates;
         if (stateActive || hasCandidates || hasEnglishInput) {
             showActive();
-            if (englishMode) {
+            if (handwriting) {
+                preeditView.setVisibility(GONE);
+                candidateContainer.setGravity(Gravity.CENTER_VERTICAL);
+                candidateScroll.scrollLocked = true;
+                expandToggleButton.setVisibility(GONE);
+                populateCandidates(candidates, /*englishStyle=*/true, null);
+            } else if (englishMode) {
                 // English mode: collapse into a single row. The typed
                 // buffer (if any) becomes the highlighted first cell;
                 // prediction strip after commit drops the buffer cell
@@ -240,10 +247,14 @@ public class CandidatesBar extends FrameLayout {
                 // instead of pinning to the top.
                 preeditView.setVisibility(GONE);
                 candidateContainer.setGravity(Gravity.CENTER_VERTICAL);
+                candidateScroll.scrollLocked = false;
+                expandToggleButton.setVisibility(VISIBLE);
                 populateCandidates(candidates, /*englishStyle=*/true,
                         hasEnglishInput ? snap.englishBuffer : null);
             } else {
                 preeditView.setVisibility(VISIBLE);
+                candidateScroll.scrollLocked = false;
+                expandToggleButton.setVisibility(VISIBLE);
                 preeditView.setText(stateActive ? buildPreedit(snap, state) : "");
                 // CN: pin candidates to top so they hug the preedit row.
                 candidateContainer.setGravity(Gravity.TOP);

@@ -40,6 +40,7 @@ public final class SettingsLayout {
         ICONS.put("联想",   R.drawable.ic_settings_lightbulb);
         ICONS.put("全键盘", R.drawable.ic_settings_keyboard_alt);
         ICONS.put("九宫格", R.drawable.ic_settings_dialpad);
+        ICONS.put("手写",   R.drawable.ic_settings_handwriting);
     }
 
     private SettingsLayout() {}

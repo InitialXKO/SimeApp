@@ -47,10 +47,6 @@ public class T9KeyboardView extends KeyboardView {
         return T9_LETTERS[idx];
     }
 
-    private static final String[] IDLE_PUNC = {
-            "，", "。", "？", "！", "：", "、", "…", "～"
-    };
-
     /** Max items in the left strip (pinyin alts + fallback letters). */
     private static final int MAX_LEFT_ITEMS = 12;
     private static final int LEFT_ITEM_HEIGHT_DP = 42;
@@ -182,8 +178,8 @@ public class T9KeyboardView extends KeyboardView {
     private void populateLeftStrip() {
         leftStrip.removeAllViews();
         if (!active) {
-            for (int i = 0; i < IDLE_PUNC.length; i++) {
-                final String p = IDLE_PUNC[i];
+            for (int i = 0; i < CommonPunctuation.SIDE_STRIP.length; i++) {
+                final String p = CommonPunctuation.SIDE_STRIP[i];
                 leftStrip.addView(makeLeftItem(p,
                         () -> emit(SimeKey.punctuation(p))));
             }
@@ -216,8 +212,8 @@ public class T9KeyboardView extends KeyboardView {
         if (added == 0) {
             // No alts and no letters — fall back to punctuation so the
             // user isn't left with an empty strip.
-            for (int i = 0; i < IDLE_PUNC.length; i++) {
-                final String p = IDLE_PUNC[i];
+            for (int i = 0; i < CommonPunctuation.SIDE_STRIP.length; i++) {
+                final String p = CommonPunctuation.SIDE_STRIP[i];
                 leftStrip.addView(makeLeftItem(p,
                         () -> emit(SimeKey.punctuation(p))));
             }

@@ -11,6 +11,7 @@ import com.shiyu.sime.ime.engine.DecodeResult;
 import com.shiyu.sime.ime.keyboard.KeyboardView;
 import com.shiyu.sime.ime.keyboard.AddPhraseView;
 import com.shiyu.sime.ime.keyboard.EmojiPanelView;
+import com.shiyu.sime.ime.keyboard.HandwritingKeyboardView;
 import com.shiyu.sime.ime.keyboard.NumberKeyboardView;
 import com.shiyu.sime.ime.keyboard.PickerPanelView;
 import com.shiyu.sime.ime.keyboard.SimeKey;
@@ -84,7 +85,13 @@ public class InputView extends LinearLayout implements InputKernel.StateObserver
         this.kernel = kernel;
         this.lastSnapshot = initialSnapshot;
         candidatesBar.setListener(new CandidatesBar.Listener() {
-            @Override public void onCandidatePick(int idx) { kernel.onCandidatePick(idx); }
+            @Override public void onCandidatePick(int idx) {
+                if (lastSnapshot != null && lastSnapshot.handwritingCandidates
+                        && currentKeyboard instanceof HandwritingKeyboardView) {
+                    ((HandwritingKeyboardView) currentKeyboard).clearAfterCandidatePick();
+                }
+                kernel.onCandidatePick(idx);
+            }
             @Override public void onEnglishLiteralCommit() { kernel.onEnglishLiteralCommit(); }
             @Override public void onSettingsClick() { kernel.switchMode(KeyboardMode.SETTINGS); }
             @Override public void onHideClick() { onHideRequest.run(); }
@@ -214,6 +221,9 @@ public class InputView extends LinearLayout implements InputKernel.StateObserver
 
     private void installExpandedView() {
         if (currentKeyboard != null) {
+            if (currentKeyboard instanceof HandwritingKeyboardView) {
+                ((HandwritingKeyboardView) currentKeyboard).dispose();
+            }
             removeView(currentKeyboard);
             currentKeyboard = null;
         }
@@ -368,9 +378,11 @@ public class InputView extends LinearLayout implements InputKernel.StateObserver
         Context ctx = getContext();
         switch (mode) {
             case CHINESE:
-                return (layout == ChineseLayout.T9)
-                        ? new T9KeyboardView(ctx)
-                        : new QwertyKeyboardView(ctx);
+                if (layout == ChineseLayout.T9) return new T9KeyboardView(ctx);
+                if (layout == ChineseLayout.HANDWRITING) {
+                    return new HandwritingKeyboardView(ctx, kernel);
+                }
+                return new QwertyKeyboardView(ctx);
             case ENGLISH:  return new QwertyKeyboardView(ctx);
             case NUMBER:   return new NumberKeyboardView(ctx);
             case SYMBOL:   return new SymbolKeyboardView(ctx);
@@ -400,18 +412,21 @@ public class InputView extends LinearLayout implements InputKernel.StateObserver
 
     /**
      * Keyboard area height (the part below the candidates bar).
-     * Portrait keeps the historical 240dp baseline so the keys stay
-     * the same size users are used to. Landscape caps at ~half the
-     * screen height so the IME doesn't eat the visible content.
+     * Handwriting deliberately gets a taller canvas: it needs a near-square
+     * writing field, while QWERTY and T9 retain their established height.
      */
     private int getKeyboardHeightPx() {
         android.util.DisplayMetrics dm = getResources().getDisplayMetrics();
         int screenH = dm.heightPixels;
         int screenW = dm.widthPixels;
         boolean landscape = screenW > screenH;
+        boolean handwriting = lastSnapshot != null
+                && lastSnapshot.mode == KeyboardMode.CHINESE
+                && lastSnapshot.chineseLayout == ChineseLayout.HANDWRITING;
         if (landscape) {
-            return Math.min(dp(236), Math.round(screenH * 0.55f));
+            return Math.min(dp(handwriting ? 300 : 236),
+                    Math.round(screenH * (handwriting ? 0.70f : 0.55f)));
         }
-        return dp(236);
+        return dp(handwriting ? 310 : 236);
     }
 }

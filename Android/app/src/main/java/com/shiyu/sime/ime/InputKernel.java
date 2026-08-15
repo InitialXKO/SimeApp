@@ -69,19 +69,30 @@ public class InputKernel {
          *  punctuation picker. Treated by the UI like prediction mode
          *  (right-edge button becomes "×" to dismiss). */
         public final boolean inPunctuationPicker;
+        /** True when candidates are supplied by offline handwriting. */
+        public final boolean handwritingCandidates;
 
         public Snapshot(InputState state, List<DecodeResult> candidates,
                  List<PinyinAlt> pinyinAlts, String topUnits,
                  KeyboardMode mode, ChineseLayout chineseLayout,
                  String englishBuffer) {
             this(state, candidates, pinyinAlts, topUnits, mode,
-                    chineseLayout, englishBuffer, false);
+                    chineseLayout, englishBuffer, false, false);
         }
 
         public Snapshot(InputState state, List<DecodeResult> candidates,
                  List<PinyinAlt> pinyinAlts, String topUnits,
                  KeyboardMode mode, ChineseLayout chineseLayout,
                  String englishBuffer, boolean inPunctuationPicker) {
+            this(state, candidates, pinyinAlts, topUnits, mode, chineseLayout,
+                    englishBuffer, inPunctuationPicker, false);
+        }
+
+        public Snapshot(InputState state, List<DecodeResult> candidates,
+                 List<PinyinAlt> pinyinAlts, String topUnits,
+                 KeyboardMode mode, ChineseLayout chineseLayout,
+                 String englishBuffer, boolean inPunctuationPicker,
+                 boolean handwritingCandidates) {
             this.state = state;
             this.candidates = candidates;
             this.pinyinAlts = pinyinAlts;
@@ -90,6 +101,7 @@ public class InputKernel {
             this.chineseLayout = chineseLayout;
             this.englishBuffer = englishBuffer;
             this.inPunctuationPicker = inPunctuationPicker;
+            this.handwritingCandidates = handwritingCandidates;
         }
     }
 
@@ -164,9 +176,10 @@ public class InputKernel {
      * directly; any other key dismisses the picker first.
      */
     private boolean inPunctuationPicker = false;
+    private boolean handwritingCandidates = false;
 
-    /** Punctuation shown by the T9 "1 key" picker, in display order. */
-    private static final String[] T9_NUM_PUNCTUATION = {
+    /** Shared common punctuation, used by T9 and handwriting. */
+    private static final String[] COMMON_PUNCTUATION = {
             "@", "#", "*", "+", "。", "~", "(", ")", "、"
     };
     private List<PinyinAlt> pinyinAlts = Collections.emptyList();
@@ -331,6 +344,35 @@ public class InputKernel {
         engineRunner.post(() -> fireCommitText(text));
     }
 
+    /** Publish the latest offline handwriting alternatives in the main bar. */
+    public void setHandwritingCandidates(List<String> texts) {
+        engineRunner.post(() -> {
+            List<DecodeResult> next = new ArrayList<>();
+            if (texts != null) {
+                for (String text : texts) {
+                    if (text != null && !text.isEmpty()) {
+                        next.add(new DecodeResult(text, "", 0));
+                    }
+                }
+            }
+            handwritingCandidates = !next.isEmpty();
+            candidates = next;
+            pinyinAlts = Collections.emptyList();
+            topUnits = "";
+            inPunctuationPicker = false;
+            publish();
+        });
+    }
+
+    public void clearHandwritingCandidates() {
+        engineRunner.post(() -> {
+            if (!handwritingCandidates) return;
+            handwritingCandidates = false;
+            candidates = Collections.emptyList();
+            publish();
+        });
+    }
+
     /**
      * Commit text picked from a sub-panel (quick-phrase / clipboard /
      * emoji / etc.). Flushes any in-flight composition the same way a
@@ -367,6 +409,15 @@ public class InputKernel {
     /** Unified candidate pick — routes by mode on the engine thread. */
     public void onCandidatePick(int index) {
         engineRunner.post(() -> {
+            if (handwritingCandidates) {
+                if (index >= 0 && index < candidates.size()) {
+                    fireCommitText(candidates.get(index).text);
+                }
+                handwritingCandidates = false;
+                candidates = Collections.emptyList();
+                publish();
+                return;
+            }
             if (mode == KeyboardMode.ENGLISH) {
                 onEnglishCompletionPickInternal(index);
             } else {
@@ -386,6 +437,10 @@ public class InputKernel {
     }
 
     private void onKeyInternal(SimeKey key) {
+        if (handwritingCandidates) {
+            handwritingCandidates = false;
+            candidates = Collections.emptyList();
+        }
         if (inPunctuationPicker && key.type != KeyType.NUM_PUNCTUATION) {
             dismissPunctuationPicker(/*publish=*/false);
         }
@@ -423,7 +478,7 @@ public class InputKernel {
 
     private void showPunctuationPicker() {
         if (!isChineseLike()) {
-            fireCommitText(T9_NUM_PUNCTUATION[0]);
+            fireCommitText(COMMON_PUNCTUATION[0]);
             return;
         }
         // T9: while composing, the 1 key inserts a separator instead
@@ -432,9 +487,13 @@ public class InputKernel {
             handleSeparator();
             return;
         }
+        showCommonPunctuationPicker();
+    }
+
+    private void showCommonPunctuationPicker() {
         java.util.ArrayList<DecodeResult> out =
-                new java.util.ArrayList<>(T9_NUM_PUNCTUATION.length);
-        for (String p : T9_NUM_PUNCTUATION) {
+                new java.util.ArrayList<>(COMMON_PUNCTUATION.length);
+        for (String p : COMMON_PUNCTUATION) {
             out.add(new DecodeResult(p, "", 0));
         }
         candidates = out;
@@ -861,6 +920,7 @@ public class InputKernel {
         engineRunner.post(() -> {
             if (layout == chineseLayout) return;
             this.chineseLayout = layout;
+            handwritingCandidates = false;
             if (isChineseLike()) redecodeAndPublish();
         });
     }
@@ -1125,6 +1185,7 @@ public class InputKernel {
         pinyinAlts = Collections.emptyList();
         topUnits = "";
         inPunctuationPicker = false;
+        handwritingCandidates = false;
     }
 
     // ===== English completion =====
@@ -1175,7 +1236,8 @@ public class InputKernel {
                 mode,
                 chineseLayout,
                 englishBuffer.toString(),
-                inPunctuationPicker);
+                inPunctuationPicker,
+                handwritingCandidates);
         mainRunner.post(() -> {
             if (observer != null) observer.onStateChanged(snap);
         });

@@ -6,5 +6,6 @@ package com.shiyu.sime.ime;
  */
 public enum ChineseLayout {
     QWERTY,
-    T9
+    T9,
+    HANDWRITING
 }

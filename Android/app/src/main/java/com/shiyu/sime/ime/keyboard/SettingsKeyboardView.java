@@ -100,7 +100,7 @@ public class SettingsKeyboardView extends KeyboardView {
     /**
      * Settings tree. Add new categories / options here.
      * <pre>
-     * 根 → row1: 键盘 → {全键盘, 九宫格}, 表情, 剪切板, 常用语
+     * 根 → row1: 键盘 → {全键盘, 九宫格, 手写}, 表情, 剪切板, 常用语
      *      row2: 声音, 震动, 繁体, 联想
      * </pre>
      * 繁体 / 表情 functional state varies — see panel listener wiring
@@ -113,7 +113,10 @@ public class SettingsKeyboardView extends KeyboardView {
         SettingsNode t9 = SettingsNode.leaf("九宫格",
                 () -> pickLayout(ChineseLayout.T9),
                 () -> prefs.getChineseLayout() == ChineseLayout.T9);
-        SettingsNode keyboardCat = SettingsNode.category("键盘", qwerty, t9);
+        SettingsNode handwriting = SettingsNode.leaf("手写",
+                () -> pickLayout(ChineseLayout.HANDWRITING),
+                () -> prefs.getChineseLayout() == ChineseLayout.HANDWRITING);
+        SettingsNode keyboardCat = SettingsNode.category("键盘", qwerty, t9, handwriting);
         // Panel openers use toggle() with a fixed false selector so the
         // tap doesn't auto-exit settings (which would race the panel
         // mode switch and bounce us back to CHINESE). Highlight stays off.
