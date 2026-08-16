@@ -54,8 +54,8 @@ android {
         applicationId = "com.shiyu.sime"
         minSdk = 24
         targetSdk = 35
-        versionCode = 69
-        versionName = "0.17.0"
+        versionCode = 70
+        versionName = "0.17.1"
 
         ndk {
             abiFilters += listOf("arm64-v8a", "x86_64")
@@ -100,7 +100,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("release")
+            if (keystoreProperties.getProperty("storeFile") != null) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 

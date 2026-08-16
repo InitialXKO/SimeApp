@@ -1,0 +1,1 @@
+Prepares a fully offline F-Droid build: runtime language models and source dependencies are versioned with the source. The optional handwriting keyboard remains omitted.
