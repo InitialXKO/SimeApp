@@ -10,7 +10,7 @@ SimeApp 包含是语输入法的 Android、macOS 和 Fcitx5 前端。C++ 输入�
 
 ## 0.17.0
 
-- Android 新增完全离线的手写键盘，使用 Handwritten NCNN 模型在设备本地识别。
+- Android 新增手写键盘，使用 Handwritten NCNN 模型在设备本地识别。
 
 ## 0.16.0
 
