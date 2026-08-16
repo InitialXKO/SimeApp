@@ -15,6 +15,7 @@ Shiyu/
 ├── Sime/                 # C++ 引擎仓库
 │   ├── include/
 │   └── src/
+├── Handwritten/          # 手写识别 runtime 与模型仓库
 └── SimeApp/
     └── Android/          # Android 项目根目录
     ├── gradlew
@@ -53,6 +54,9 @@ sdk.dir=/path/to/your/Android/Sdk
 
 所有命令在 `Android/` 目录下执行。默认从兄弟目录 `../../Sime` 加载引擎；
 其他布局可在执行 Gradle 前设置 `SIME_ENGINE_ROOT=/path/to/Sime`。
+手写功能默认从兄弟目录 `../../Handwritten` 加载 runtime 和模型；其他布局可设置
+`HANDWRITTEN_ROOT=/path/to/Handwritten`（或 `-PhandwrittenRoot=...`）。模型由
+Handwritten 提供，SimeApp Release 会将其打进 APK。
 
 ### Debug 构建 + 安装到设备
 

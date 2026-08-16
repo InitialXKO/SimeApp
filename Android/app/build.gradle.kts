@@ -10,6 +10,13 @@ val keystoreProperties = Properties().apply {
         keystorePropertiesFile.inputStream().use { load(it) }
     }
 }
+val handwrittenRoot = project.findProperty("handwrittenRoot")?.let { file(it.toString()) }
+    ?: System.getenv("HANDWRITTEN_ROOT")?.let(::file)
+    ?: rootProject.file("../../Handwritten")
+require(handwrittenRoot.resolve("android/runtime/src/main/java").isDirectory
+        && handwrittenRoot.resolve("android/app/src/main/assets").isDirectory) {
+    "Handwritten runtime not found at $handwrittenRoot; set HANDWRITTEN_ROOT or -PhandwrittenRoot."
+}
 
 android {
     namespace = "com.shiyu.sime"
@@ -28,7 +35,8 @@ android {
         externalNativeBuild {
             cmake {
                 arguments(
-                    "-DSIME_NCNN_SOURCE_DIR=${rootProject.layout.buildDirectory.get().asFile}/ncnn-20260526"
+                    "-DSIME_NCNN_SOURCE_DIR=${rootProject.layout.buildDirectory.get().asFile}/ncnn-20260526",
+                    "-DHANDWRITTEN_ROOT=${handwrittenRoot.absolutePath}"
                 )
             }
         }
@@ -79,6 +87,13 @@ android {
     }
 
     ndkVersion = "30.0.14904198"
+
+    sourceSets {
+        getByName("main") {
+            java.srcDir(handwrittenRoot.resolve("android/runtime/src/main/java"))
+            assets.srcDir(handwrittenRoot.resolve("android/app/src/main/assets"))
+        }
+    }
 }
 
 dependencies {

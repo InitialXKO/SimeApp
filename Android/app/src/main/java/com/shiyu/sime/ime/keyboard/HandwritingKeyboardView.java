@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.shiyu.sime.R;
 import com.shiyu.sime.ime.InputKernel;
 import com.shiyu.sime.ime.feedback.InputFeedbacks;
-import com.shiyu.sime.ime.handwriting.HCCRRecognizer;
+import com.shiyu.handwritten.runtime.HCCRRecognizer;
 import com.shiyu.sime.ime.theme.Typography;
 
 import java.io.IOException;
@@ -206,7 +206,11 @@ public final class HandwritingKeyboardView extends KeyboardView {
 
     private HCCRRecognizer getRecognizer() throws IOException {
         synchronized (RECOGNIZER_LOCK) {
-            if (recognizer == null) recognizer = new HCCRRecognizer(getContext().getAssets());
+            if (recognizer == null) {
+                HCCRRecognizer.loadNativeLibrary("sime_jni");
+                recognizer = new HCCRRecognizer(getContext().getAssets(),
+                        "mbv2_aug.int8.ncnn.param", "mbv2_aug.int8.ncnn.bin", "charset.json");
+            }
             return recognizer;
         }
     }
