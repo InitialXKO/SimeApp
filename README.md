@@ -8,6 +8,10 @@ SimeApp 包含是语输入法的 Android、macOS 和 Fcitx5 前端。C++ 输入�
 
 - Android 和 macOS 的正式版本可以直接去 [Release 页面](https://github.com/Ismantic/SimeApp/releases) 下载。
 
+## 0.17.0
+
+- Android 新增完全离线的手写键盘，使用 Handwritten NCNN 模型在设备本地识别。
+
 ## 0.16.0
 
 - 新增本地 GRU 整句排序器，提升全拼和九宫格整句准确率；模型完全离线运行。
