@@ -58,6 +58,15 @@ sdk.dir=/path/to/your/Android/Sdk
 `HANDWRITTEN_ROOT=/path/to/Handwritten`（或 `-PhandwrittenRoot=...`）。模型由
 Handwritten 提供，SimeApp Release 会将其打进 APK。
 
+### 不含手写模型的构建
+
+传入 `-PincludeHandwriting=false` 会移除手写入口及其 NCNN 模型；手写 runtime 源码
+仍会参与编译，但不会加载模型。此变体用于模型再分发权未确认的发行渠道：
+
+```bash
+./gradlew assembleRelease -PincludeHandwriting=false
+```
+
 ### Debug 构建 + 安装到设备
 
 ```bash

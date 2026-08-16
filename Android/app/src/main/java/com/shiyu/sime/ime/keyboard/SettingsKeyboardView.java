@@ -2,6 +2,7 @@ package com.shiyu.sime.ime.keyboard;
 
 import android.content.Context;
 
+import com.shiyu.sime.BuildConfig;
 import com.shiyu.sime.ime.ChineseLayout;
 import com.shiyu.sime.ime.feedback.InputFeedbacks;
 import com.shiyu.sime.ime.keyboard.framework.KeyView;
@@ -113,10 +114,15 @@ public class SettingsKeyboardView extends KeyboardView {
         SettingsNode t9 = SettingsNode.leaf("九宫格",
                 () -> pickLayout(ChineseLayout.T9),
                 () -> prefs.getChineseLayout() == ChineseLayout.T9);
-        SettingsNode handwriting = SettingsNode.leaf("手写",
-                () -> pickLayout(ChineseLayout.HANDWRITING),
-                () -> prefs.getChineseLayout() == ChineseLayout.HANDWRITING);
-        SettingsNode keyboardCat = SettingsNode.category("键盘", qwerty, t9, handwriting);
+        SettingsNode keyboardCat;
+        if (BuildConfig.INCLUDE_HANDWRITING) {
+            SettingsNode handwriting = SettingsNode.leaf("手写",
+                    () -> pickLayout(ChineseLayout.HANDWRITING),
+                    () -> prefs.getChineseLayout() == ChineseLayout.HANDWRITING);
+            keyboardCat = SettingsNode.category("键盘", qwerty, t9, handwriting);
+        } else {
+            keyboardCat = SettingsNode.category("键盘", qwerty, t9);
+        }
         // Panel openers use toggle() with a fixed false selector so the
         // tap doesn't auto-exit settings (which would race the panel
         // mode switch and bounce us back to CHINESE). Highlight stays off.

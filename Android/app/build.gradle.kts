@@ -13,6 +13,13 @@ val keystoreProperties = Properties().apply {
 val handwrittenRoot = project.findProperty("handwrittenRoot")?.let { file(it.toString()) }
     ?: System.getenv("HANDWRITTEN_ROOT")?.let(::file)
     ?: rootProject.file("../../Handwritten")
+// F-Droid builds disable this to omit the CASIA-trained handwriting model.
+// The runtime source stays a normal build dependency, but the UI cannot
+// reach it and no handwriting model is bundled or loaded.
+val includeHandwriting = providers.gradleProperty("includeHandwriting")
+    .map { it.toBoolean() }
+    .orElse(true)
+    .get()
 require(handwrittenRoot.resolve("android/runtime/src/main/java").isDirectory
         && handwrittenRoot.resolve("android/app/src/main/assets").isDirectory) {
     "Handwritten runtime not found at $handwrittenRoot; set HANDWRITTEN_ROOT or -PhandwrittenRoot."
@@ -40,6 +47,7 @@ android {
                 )
             }
         }
+        buildConfigField("boolean", "INCLUDE_HANDWRITING", includeHandwriting.toString())
     }
 
     signingConfigs {
@@ -88,10 +96,16 @@ android {
 
     ndkVersion = "30.0.14904198"
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     sourceSets {
         getByName("main") {
             java.srcDir(handwrittenRoot.resolve("android/runtime/src/main/java"))
-            assets.srcDir(handwrittenRoot.resolve("android/app/src/main/assets"))
+            if (includeHandwriting) {
+                assets.srcDir(handwrittenRoot.resolve("android/app/src/main/assets"))
+            }
         }
     }
 }

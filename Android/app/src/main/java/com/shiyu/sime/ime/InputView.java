@@ -5,6 +5,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import com.shiyu.sime.BuildConfig;
 import com.shiyu.sime.ime.candidates.CandidatesBar;
 import com.shiyu.sime.ime.candidates.ExpandedCandidatesView;
 import com.shiyu.sime.ime.engine.DecodeResult;
@@ -379,7 +380,7 @@ public class InputView extends LinearLayout implements InputKernel.StateObserver
         switch (mode) {
             case CHINESE:
                 if (layout == ChineseLayout.T9) return new T9KeyboardView(ctx);
-                if (layout == ChineseLayout.HANDWRITING) {
+                if (layout == ChineseLayout.HANDWRITING && BuildConfig.INCLUDE_HANDWRITING) {
                     return new HandwritingKeyboardView(ctx, kernel);
                 }
                 return new QwertyKeyboardView(ctx);
@@ -420,7 +421,7 @@ public class InputView extends LinearLayout implements InputKernel.StateObserver
         int screenH = dm.heightPixels;
         int screenW = dm.widthPixels;
         boolean landscape = screenW > screenH;
-        boolean handwriting = lastSnapshot != null
+        boolean handwriting = BuildConfig.INCLUDE_HANDWRITING && lastSnapshot != null
                 && lastSnapshot.mode == KeyboardMode.CHINESE
                 && lastSnapshot.chineseLayout == ChineseLayout.HANDWRITING;
         if (landscape) {
