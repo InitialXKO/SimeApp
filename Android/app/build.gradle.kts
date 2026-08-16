@@ -18,6 +18,12 @@ val includeHandwriting = providers.gradleProperty("includeHandwriting")
     .orElse(true)
     .get()
 val requiredHandwrittenRoot = rootProject.file("../require/Handwritten")
+val requiredSimeRoot = rootProject.file("../require/Sime")
+val simeRoot = project.findProperty("simeEngineRoot")?.let { file(it.toString()) }
+    ?: System.getenv("SIME_ENGINE_ROOT")?.let(::file)
+    ?: requiredSimeRoot.takeIf { it.isDirectory }
+    ?: rootProject.file("../../Sime")
+val simeAssetsRoot = simeRoot.resolve("save")
 val requiredHandwrittenUsable = requiredHandwrittenRoot
     .resolve("android/runtime/src/main/java").isDirectory
     && (!includeHandwriting || requiredHandwrittenRoot
@@ -27,6 +33,10 @@ val handwrittenRoot = project.findProperty("handwrittenRoot")?.let { file(it.toS
     ?: requiredHandwrittenRoot.takeIf { requiredHandwrittenUsable }
     ?: rootProject.file("../../Handwritten")
 val requiredNcnnRoot = rootProject.file("../require/ncnn")
+require(simeAssetsRoot.resolve("sime.cnt").isFile
+        && simeAssetsRoot.resolve("sime.dict").isFile) {
+    "Sime runtime model bundle not found at $simeAssetsRoot."
+}
 require(handwrittenRoot.resolve("android/runtime/src/main/java").isDirectory) {
     "Handwritten runtime not found at $handwrittenRoot; set HANDWRITTEN_ROOT or -PhandwrittenRoot."
 }
@@ -54,6 +64,7 @@ android {
             cmake {
                 arguments(
                     "-DSIME_NCNN_SOURCE_DIR=${if (requiredNcnnRoot.isDirectory) requiredNcnnRoot else rootProject.layout.buildDirectory.get().asFile.resolve("ncnn-20260526")}",
+                    "-DSIME_ENGINE_ROOT=${simeRoot.absolutePath}",
                     "-DHANDWRITTEN_ROOT=${handwrittenRoot.absolutePath}"
                 )
             }
@@ -113,6 +124,7 @@ android {
 
     sourceSets {
         getByName("main") {
+            assets.srcDir(simeAssetsRoot)
             java.srcDir(handwrittenRoot.resolve("android/runtime/src/main/java"))
             if (includeHandwriting) {
                 assets.srcDir(handwrittenRoot.resolve("android/app/src/main/assets"))
