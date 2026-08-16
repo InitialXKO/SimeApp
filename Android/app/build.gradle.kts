@@ -10,9 +10,6 @@ val keystoreProperties = Properties().apply {
         keystorePropertiesFile.inputStream().use { load(it) }
     }
 }
-val handwrittenRoot = project.findProperty("handwrittenRoot")?.let { file(it.toString()) }
-    ?: System.getenv("HANDWRITTEN_ROOT")?.let(::file)
-    ?: rootProject.file("../../Handwritten")
 // F-Droid builds disable this to omit the CASIA-trained handwriting model.
 // The runtime source stays a normal build dependency, but the UI cannot
 // reach it and no handwriting model is bundled or loaded.
@@ -20,9 +17,23 @@ val includeHandwriting = providers.gradleProperty("includeHandwriting")
     .map { it.toBoolean() }
     .orElse(true)
     .get()
-require(handwrittenRoot.resolve("android/runtime/src/main/java").isDirectory
-        && handwrittenRoot.resolve("android/app/src/main/assets").isDirectory) {
+val requiredHandwrittenRoot = rootProject.file("../require/Handwritten")
+val requiredHandwrittenUsable = requiredHandwrittenRoot
+    .resolve("android/runtime/src/main/java").isDirectory
+    && (!includeHandwriting || requiredHandwrittenRoot
+        .resolve("android/app/src/main/assets").isDirectory)
+val handwrittenRoot = project.findProperty("handwrittenRoot")?.let { file(it.toString()) }
+    ?: System.getenv("HANDWRITTEN_ROOT")?.let(::file)
+    ?: requiredHandwrittenRoot.takeIf { requiredHandwrittenUsable }
+    ?: rootProject.file("../../Handwritten")
+val requiredNcnnRoot = rootProject.file("../require/ncnn")
+require(handwrittenRoot.resolve("android/runtime/src/main/java").isDirectory) {
     "Handwritten runtime not found at $handwrittenRoot; set HANDWRITTEN_ROOT or -PhandwrittenRoot."
+}
+if (includeHandwriting) {
+    require(handwrittenRoot.resolve("android/app/src/main/assets").isDirectory) {
+        "Handwritten model assets not found at $handwrittenRoot."
+    }
 }
 
 android {
@@ -42,7 +53,7 @@ android {
         externalNativeBuild {
             cmake {
                 arguments(
-                    "-DSIME_NCNN_SOURCE_DIR=${rootProject.layout.buildDirectory.get().asFile}/ncnn-20260526",
+                    "-DSIME_NCNN_SOURCE_DIR=${if (requiredNcnnRoot.isDirectory) requiredNcnnRoot else rootProject.layout.buildDirectory.get().asFile.resolve("ncnn-20260526")}",
                     "-DHANDWRITTEN_ROOT=${handwrittenRoot.absolutePath}"
                 )
             }

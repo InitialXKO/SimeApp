@@ -11,13 +11,12 @@
 ## 项目结构
 
 ```
-Shiyu/
-├── Sime/                 # C++ 引擎仓库
-│   ├── include/
-│   └── src/
-├── Handwritten/          # 手写识别 runtime 与模型仓库
-└── SimeApp/
-    └── Android/          # Android 项目根目录
+SimeApp/
+├── require/              # 固定版本的源码依赖（Git submodule）
+│   ├── Sime/             # C++ 引擎
+│   ├── Handwritten/      # 手写识别 runtime
+│   └── ncnn/             # CPU 推理框架
+└── Android/              # Android 项目根目录
     ├── gradlew
     ├── app/
     │   ├── build.gradle.kts
@@ -27,6 +26,12 @@ Shiyu/
     │       ├── assets/                 # 模型文件（见下方）
     │       └── res/                    # 布局、颜色、图标等资源
     └── local.properties               # SDK 路径（不入库）
+```
+
+首次检出后初始化固定版本的源码依赖：
+
+```bash
+git submodule update --init --recursive
 ```
 
 ## 准备工作
@@ -52,11 +57,10 @@ sdk.dir=/path/to/your/Android/Sdk
 
 ## 构建
 
-所有命令在 `Android/` 目录下执行。默认从兄弟目录 `../../Sime` 加载引擎；
-其他布局可在执行 Gradle 前设置 `SIME_ENGINE_ROOT=/path/to/Sime`。
-手写功能默认从兄弟目录 `../../Handwritten` 加载 runtime 和模型；其他布局可设置
-`HANDWRITTEN_ROOT=/path/to/Handwritten`（或 `-PhandwrittenRoot=...`）。模型由
-Handwritten 提供，SimeApp Release 会将其打进 APK。
+所有命令在 `Android/` 目录下执行。默认优先使用 `../require/` 中固定版本的 Sime、
+Handwritten runtime 和 ncnn；未初始化 submodule 时，Sime/Handwritten 可回退到同级
+源码目录。可以通过 `SIME_ENGINE_ROOT`、`HANDWRITTEN_ROOT` 或
+`-PhandwrittenRoot=...` 覆盖。
 
 ### 不含手写模型的构建
 

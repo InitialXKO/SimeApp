@@ -9,10 +9,16 @@ function(simeapp_add_engine)
         set(SIME_ENGINE_ROOT "$ENV{SIME_ENGINE_ROOT}")
     endif()
     if(NOT SIME_ENGINE_ROOT)
-        get_filename_component(
-            SIME_ENGINE_ROOT "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../../Sime"
-            ABSOLUTE
-        )
+        get_filename_component(_required_sime_root
+            "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../require/Sime" ABSOLUTE)
+        if(EXISTS "${_required_sime_root}/CMakeLists.txt")
+            set(SIME_ENGINE_ROOT "${_required_sime_root}")
+        else()
+            get_filename_component(
+                SIME_ENGINE_ROOT "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../../Sime"
+                ABSOLUTE
+            )
+        endif()
     endif()
 
     if(NOT EXISTS "${SIME_ENGINE_ROOT}/CMakeLists.txt"

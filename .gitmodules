@@ -1,0 +1,9 @@
+[submodule "require/Sime"]
+	path = require/Sime
+	url = https://github.com/Ismantic/Sime.git
+[submodule "require/Handwritten"]
+	path = require/Handwritten
+	url = https://github.com/Ismantic/Handwritten.git
+[submodule "require/ncnn"]
+	path = require/ncnn
+	url = https://github.com/Tencent/ncnn.git

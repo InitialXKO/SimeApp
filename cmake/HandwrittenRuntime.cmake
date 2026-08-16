@@ -5,10 +5,16 @@ function(simeapp_handwritten_root out_var)
         set(HANDWRITTEN_ROOT "$ENV{HANDWRITTEN_ROOT}")
     endif()
     if(NOT HANDWRITTEN_ROOT)
-        get_filename_component(
-            HANDWRITTEN_ROOT "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../../Handwritten"
-            ABSOLUTE
-        )
+        get_filename_component(_required_handwritten_root
+            "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../require/Handwritten" ABSOLUTE)
+        if(EXISTS "${_required_handwritten_root}/android/runtime/src/main/jni/hccr_jni.cc")
+            set(HANDWRITTEN_ROOT "${_required_handwritten_root}")
+        else()
+            get_filename_component(
+                HANDWRITTEN_ROOT "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../../Handwritten"
+                ABSOLUTE
+            )
+        endif()
     endif()
 
     set(runtime_jni "${HANDWRITTEN_ROOT}/android/runtime/src/main/jni/hccr_jni.cc")
