@@ -1,0 +1,9 @@
+Sime is a fully offline Chinese Pinyin input method.
+
+It supports full Pinyin and T9 layouts, local phrase learning, emoji, clipboard
+history, quick phrases, and a local GRU sentence reranker. Input and candidate
+ranking remain on the device; the app has no network permission, tracking, or
+advertising SDK.
+
+The F-Droid build does not include the optional handwriting recognizer because
+its training-data redistribution terms are not suitable for F-Droid.
