@@ -77,17 +77,17 @@ fcitx5 -r
 
 ## 源码
 
-开发时推荐把两个仓库放在同一目录：
+克隆时请一并取得源码依赖：
 
-```text
-Shiyu/
-├── Sime/
-└── SimeApp/
+```bash
+git clone --recurse-submodules https://github.com/Ismantic/SimeApp.git
+cd SimeApp
 ```
 
-默认构建会从 `../Sime` 加载引擎。其他布局可设置环境变量
-`SIME_ENGINE_ROOT`，或向 CMake 传入
-`-DSIME_ENGINE_ROOT=/path/to/Sime`。
+已克隆的工作区可用 `git submodule update --init --recursive` 补齐
+`require/Sime`、`require/ncnn` 与 `require/Handwritten`。构建默认使用这些子模块；
+也可以用 `SIME_ENGINE_ROOT` 或 CMake 的
+`-DSIME_ENGINE_ROOT=/path/to/Sime` 指向本地 Sime 源码。
 
 ## 构建
 
@@ -98,7 +98,18 @@ Android：
 ```bash
 cd Android
 ./gradlew testDebugUnitTest
-./gradlew assembleDebug
+./gradlew assembleDebug -PincludeHandwriting=false
+```
+
+上面的独立构建不含手写模型。启用手写时，还需要准备含模型资产的
+[Handwritten](https://github.com/Ismantic/Handwritten) 工作树，并通过
+`HANDWRITTEN_ROOT=/path/to/Handwritten` 或 `-PhandwrittenRoot=/path/to/Handwritten`
+指定它。
+
+用于 F-Droid 的 Release 构建为：
+
+```bash
+./gradlew --no-daemon clean :app:assembleRelease -PincludeHandwriting=false
 ```
 
 Fcitx5：
@@ -116,7 +127,8 @@ cmake -S macOS -B build/macos -G Xcode
 cmake --build build/macos --config Release
 ```
 
-运行时模型 `sime.dict` 和 `sime.cnt` 由 Sime 的 `pipeline/` 生成，不提交到本仓库。平台打包前需将模型复制到对应资源目录。
+Android、macOS 与 Fcitx5 均从 Sime 子模块的 `save/` 读取版本化运行时模型；无需
+手动复制模型。原始训练语料和中间产物不在应用仓库中。
 
 ## 隐私
 
