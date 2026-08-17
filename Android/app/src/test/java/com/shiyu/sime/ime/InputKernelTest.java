@@ -29,6 +29,7 @@ public class InputKernelTest {
         final Map<String, DecodeResult[]> sentenceMap = new HashMap<>();
         final Map<String, DecodeResult[]> numSentenceMap = new HashMap<>();
         final Map<String, String[]> t9PinyinMap = new HashMap<>();
+        final Map<String, DecodeResult[]> tokenMap = new HashMap<>();
         DecodeResult[] nextResults = new DecodeResult[0];
         int sentenceCalls = 0;
         int numSentenceCalls = 0;
@@ -69,9 +70,14 @@ public class InputKernelTest {
             nextResults = results;
         }
 
+        void putTokens(String prefix, DecodeResult... results) {
+            tokenMap.put(prefix, results);
+        }
+
         @Override
         public DecodeResult[] getTokens(String prefix, int limit, boolean enOnly) {
-            return new DecodeResult[0];
+            DecodeResult[] r = tokenMap.get(prefix);
+            return r != null ? r : new DecodeResult[0];
         }
 
         @Override
@@ -310,6 +316,29 @@ public class InputKernelTest {
         kernel.onCandidatePick(0);
 
         assertEquals(Arrays.asList("save", "the"), listener.committed);
+    }
+
+    @Test
+    public void englishModePredictionAddsSpaceAfterCompletion() {
+        decoder.putTokens("save", r("save", "", 0, new int[] {1}));
+        decoder.putNext(r("the", "", 0, new int[] {2}));
+        kernel.switchMode(KeyboardMode.ENGLISH);
+        for (char c : "save".toCharArray()) kernel.onKey(SimeKey.letter(c));
+
+        kernel.onCandidatePick(0);
+        kernel.onCandidatePick(0);
+
+        assertEquals(Arrays.asList("save", " the"), listener.committed);
+    }
+
+    @Test
+    public void englishModeSpaceCommitsTheWordBoundary() {
+        kernel.switchMode(KeyboardMode.ENGLISH);
+        for (char c : "save".toCharArray()) kernel.onKey(SimeKey.letter(c));
+
+        kernel.onKey(SimeKey.space());
+
+        assertEquals(Collections.singletonList("save "), listener.committed);
     }
 
     // ---------- T9 ----------

@@ -440,7 +440,7 @@ public class InputKernel {
     public void onEnglishLiteralCommit() {
         engineRunner.post(() -> {
             if (mode == KeyboardMode.ENGLISH && englishBuffer.length() > 0) {
-                commitEnglishBuffer();
+                commitEnglishBuffer(true);
             }
         });
     }
@@ -598,7 +598,7 @@ public class InputKernel {
     private void handleSpace() {
         if (mode == KeyboardMode.ENGLISH) {
             if (englishBuffer.length() > 0) {
-                commitEnglishBuffer();
+                commitEnglishBuffer(true);
             } else {
                 fireCommitText(" ");
             }
@@ -893,7 +893,14 @@ public class InputKernel {
         // English completion is for English buffer — trad doesn't apply
         // (English text doesn't get converted), but call through anyway
         // for consistency.
-        fireCommitText(tradTextOf(c));
+        String text = tradTextOf(c);
+        if (autoSpaceEnglishWords && previousCommitEndsWithAsciiWord
+                && startsWithAsciiWord(text)) {
+            fireCommitText(" " + text);
+        } else {
+            fireCommitText(text);
+        }
+        previousCommitEndsWithAsciiWord = endsWithAsciiWord(text);
         fireSetComposingText("");
         showPredictions(true);
     }
@@ -1223,9 +1230,15 @@ public class InputKernel {
      * picking a completion).
      */
     private void commitEnglishBuffer() {
+        commitEnglishBuffer(false);
+    }
+
+    /** Commit the current English preedit; space is explicit when requested. */
+    private void commitEnglishBuffer(boolean appendSpace) {
         String text = englishBuffer.toString();
         englishBuffer.setLength(0);
-        fireCommitText(text);
+        fireCommitText(appendSpace ? text + " " : text);
+        previousCommitEndsWithAsciiWord = endsWithAsciiWord(text);
         fireSetComposingText("");
         candidates = Collections.emptyList();
         // No context push for raw text (no token IDs)
