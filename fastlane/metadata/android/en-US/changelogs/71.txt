@@ -1,0 +1,1 @@
+Fix English candidate spacing: selecting consecutive English predictions now inserts a word space by default.

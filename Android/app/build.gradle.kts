@@ -54,8 +54,8 @@ android {
         applicationId = "com.shiyu.sime"
         minSdk = 24
         targetSdk = 35
-        versionCode = 70
-        versionName = "0.17.1"
+        versionCode = 71
+        versionName = "0.17.2"
 
         ndk {
             abiFilters += listOf("arm64-v8a", "x86_64")
