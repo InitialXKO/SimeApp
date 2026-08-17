@@ -8,6 +8,17 @@ SimeApp 包含是语输入法的 Android、macOS 和 Fcitx5 前端。C++ 输入�
 
 - Android 和 macOS 的正式版本可以直接去 [Release 页面](https://github.com/Ismantic/SimeApp/releases) 下载。
 
+## Android 界面
+
+<p align="center">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/01-onboarding.jpg" width="45%" alt="启用是语输入法" />
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/02-tools.jpg" width="45%" alt="输入工具面板" />
+</p>
+<p align="center">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/03-layouts.jpg" width="45%" alt="全键盘与九宫格布局" />
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/04-t9.jpg" width="45%" alt="九宫格输入" />
+</p>
+
 ## 0.17.0
 
 - Android 新增手写键盘，使用 Handwritten NCNN 模型在设备本地识别。
