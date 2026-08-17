@@ -163,6 +163,10 @@ public class InputKernel {
     private ChineseLayout chineseLayout = ChineseLayout.QWERTY;
     private boolean predictionEnabled = true;
     private boolean traditionalEnabled = false;
+    /** Persisted preference; the settings UI will expose it separately. */
+    private boolean autoSpaceEnglishWords = true;
+    /** Tracks the committed prediction context, not arbitrary host-app text. */
+    private boolean previousCommitEndsWithAsciiWord = false;
     private com.shiyu.sime.ime.data.TraditionalConverter tradConverter;
     /** Set true while the user is in a password / OTP / "no personalized
      *  learning" field. Suppresses prediction without changing the user's
@@ -293,6 +297,11 @@ public class InputKernel {
             // Re-publish with trad-mapped candidate text (or simp if off).
             publish();
         });
+    }
+
+    /** Controls spacing between consecutive English prediction candidates. */
+    public void setAutoSpaceEnglishWords(boolean enabled) {
+        engineRunner.post(() -> this.autoSpaceEnglishWords = enabled);
     }
 
     /** Public hook for the candidates bar's "×" button: drop the
@@ -745,6 +754,7 @@ public class InputKernel {
         }
         exitPrediction();
         state.clearContext();
+        previousCommitEndsWithAsciiWord = false;
         fireCommitText(text);
         publish();
     }
@@ -839,6 +849,7 @@ public class InputKernel {
         if (state.fullySelected()) {
             String out = state.committedText();
             fireCommitText(out);
+            previousCommitEndsWithAsciiWord = endsWithAsciiWord(out);
             // Learn each selection in turn so the engine's per-call
             // context matches what the user actually saw at pick time
             // (each successive learn picks up the prior selections via
@@ -863,7 +874,14 @@ public class InputKernel {
             decoder.learnUserSentence(state.contextIdsArray(), c.tokenIds);
         }
         state.pushContext(c.tokenIds);
-        fireCommitText(tradTextOf(c));
+        String text = tradTextOf(c);
+        if (autoSpaceEnglishWords && previousCommitEndsWithAsciiWord
+                && startsWithAsciiWord(text)) {
+            fireCommitText(" " + text);
+        } else {
+            fireCommitText(text);
+        }
+        previousCommitEndsWithAsciiWord = endsWithAsciiWord(text);
         showPredictions(false);
     }
 
@@ -1224,7 +1242,21 @@ public class InputKernel {
         topUnits = "";
         inPunctuationPicker = false;
         englishBuffer.setLength(0);
+        previousCommitEndsWithAsciiWord = false;
         publish();
+    }
+
+    private static boolean startsWithAsciiWord(String text) {
+        return text != null && !text.isEmpty() && isAsciiWordChar(text.charAt(0));
+    }
+
+    private static boolean endsWithAsciiWord(String text) {
+        return text != null && !text.isEmpty()
+                && isAsciiWordChar(text.charAt(text.length() - 1));
+    }
+
+    private static boolean isAsciiWordChar(char c) {
+        return c <= 0x7f && (Character.isLetterOrDigit(c) || c == '_');
     }
 
     private void publish() {

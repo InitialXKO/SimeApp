@@ -109,6 +109,7 @@ public class SimeService extends InputMethodService
         kernel.setChineseLayout(prefs.getChineseLayout());
         kernel.setPredictionEnabled(prefs.getPredictionEnabled());
         kernel.setTraditionalEnabled(prefs.getTraditionalEnabled());
+        kernel.setAutoSpaceEnglishWords(prefs.getAutoSpaceEnglishWords());
         com.shiyu.sime.ime.feedback.InputFeedbacks.setSoundEnabled(
                 prefs.getSoundEnabled());
         com.shiyu.sime.ime.feedback.InputFeedbacks.setVibrationEnabled(

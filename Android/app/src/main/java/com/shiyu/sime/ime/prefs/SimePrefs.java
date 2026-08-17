@@ -18,6 +18,8 @@ public final class SimePrefs {
     private static final String KEY_SOUND_ENABLED = "sound_enabled";
     private static final String KEY_VIBRATION_ENABLED = "vibration_enabled";
     private static final String KEY_TRADITIONAL_ENABLED = "traditional_enabled";
+    private static final String KEY_AUTO_SPACE_ENGLISH_WORDS =
+            "auto_space_english_words";
 
     private final SharedPreferences sp;
 
@@ -71,5 +73,14 @@ public final class SimePrefs {
 
     public void setTraditionalEnabled(boolean enabled) {
         sp.edit().putBoolean(KEY_TRADITIONAL_ENABLED, enabled).apply();
+    }
+
+    /** Insert a space when an English prediction follows an English word. */
+    public boolean getAutoSpaceEnglishWords() {
+        return sp.getBoolean(KEY_AUTO_SPACE_ENGLISH_WORDS, true);
+    }
+
+    public void setAutoSpaceEnglishWords(boolean enabled) {
+        sp.edit().putBoolean(KEY_AUTO_SPACE_ENGLISH_WORDS, enabled).apply();
     }
 }

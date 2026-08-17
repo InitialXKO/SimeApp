@@ -29,6 +29,7 @@ public class InputKernelTest {
         final Map<String, DecodeResult[]> sentenceMap = new HashMap<>();
         final Map<String, DecodeResult[]> numSentenceMap = new HashMap<>();
         final Map<String, String[]> t9PinyinMap = new HashMap<>();
+        DecodeResult[] nextResults = new DecodeResult[0];
         int sentenceCalls = 0;
         int numSentenceCalls = 0;
         int t9PinyinCalls = 0;
@@ -61,7 +62,11 @@ public class InputKernelTest {
 
         @Override
         public DecodeResult[] nextTokens(int[] contextIds, int limit, boolean enOnly) {
-            return new DecodeResult[0];
+            return nextResults;
+        }
+
+        void putNext(DecodeResult... results) {
+            nextResults = results;
         }
 
         @Override
@@ -116,6 +121,10 @@ public class InputKernelTest {
 
     private static DecodeResult r(String text, String units, int consumed) {
         return new DecodeResult(text, units, consumed);
+    }
+
+    private static DecodeResult r(String text, String units, int consumed, int[] tokenIds) {
+        return new DecodeResult(text, units, consumed, tokenIds);
     }
 
     private InputKernel.Snapshot snap() {
@@ -276,6 +285,31 @@ public class InputKernelTest {
         assertEquals(Arrays.asList("你"), listener.committed);
         assertEquals(KeyboardMode.ENGLISH, mode());
         assertTrue(state().buffer.isEmpty());
+    }
+
+    @Test
+    public void englishPredictionAddsSpaceAfterEnglishCandidate() {
+        decoder.putSentence("save", r("save", "save", 4, new int[] {1}));
+        decoder.putNext(r("the", "", 0, new int[] {2}));
+        for (char c : "save".toCharArray()) kernel.onKey(SimeKey.letter(c));
+
+        kernel.onCandidatePick(0);
+        kernel.onCandidatePick(0);
+
+        assertEquals(Arrays.asList("save", " the"), listener.committed);
+    }
+
+    @Test
+    public void englishPredictionSpacingCanBeDisabled() {
+        decoder.putSentence("save", r("save", "save", 4, new int[] {1}));
+        decoder.putNext(r("the", "", 0, new int[] {2}));
+        kernel.setAutoSpaceEnglishWords(false);
+        for (char c : "save".toCharArray()) kernel.onKey(SimeKey.letter(c));
+
+        kernel.onCandidatePick(0);
+        kernel.onCandidatePick(0);
+
+        assertEquals(Arrays.asList("save", "the"), listener.committed);
     }
 
     // ---------- T9 ----------
