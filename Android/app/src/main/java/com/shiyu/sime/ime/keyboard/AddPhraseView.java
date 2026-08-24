@@ -31,7 +31,14 @@ import com.shiyu.sime.ime.theme.SimeTheme;
  *   small hint line
  * </pre>
  */
+import com.shiyu.sime.ime.data.ClipboardStore;
+
 public class AddPhraseView extends LinearLayout {
+
+    public enum Target {
+        QUICK_PHRASE,
+        CLIPBOARD
+    }
 
     public interface OnDismissListener {
         /** User tapped × or 完成 — host should remove the overlay. */
@@ -42,16 +49,23 @@ public class AddPhraseView extends LinearLayout {
      *  InputView writes here right before showing the overlay. */
     private static String pendingSeed = "";
     private static int pendingEditIndex = -1;
+    private static Target pendingTarget = Target.QUICK_PHRASE;
 
     public static void setSeed(String text, int editIndex) {
+        setSeed(text, editIndex, Target.QUICK_PHRASE);
+    }
+
+    public static void setSeed(String text, int editIndex, Target target) {
         pendingSeed = text == null ? "" : text;
         pendingEditIndex = editIndex;
+        pendingTarget = target != null ? target : Target.QUICK_PHRASE;
     }
 
     private final SimeTheme theme;
     private final StringBuilder buffer = new StringBuilder();
     private String preedit = "";
     private final int editIndex;
+    private final Target target;
 
     private TextView bufferDisplay;
     private OnDismissListener dismissListener;
@@ -72,8 +86,10 @@ public class AddPhraseView extends LinearLayout {
         // Pull seed; one-shot.
         this.buffer.append(pendingSeed);
         this.editIndex = pendingEditIndex;
+        this.target = pendingTarget;
         pendingSeed = "";
         pendingEditIndex = -1;
+        pendingTarget = Target.QUICK_PHRASE;
         setOrientation(VERTICAL);
         setBackgroundColor(theme.keyboardBackground);
         setPadding(0, dp(2), 0, dp(8));
@@ -106,7 +122,13 @@ public class AddPhraseView extends LinearLayout {
         header.addView(cancel);
 
         TextView title = new TextView(getContext());
-        title.setText(editIndex >= 0 ? "编辑常用语" : "添加常用语");
+        String titleText;
+        if (target == Target.CLIPBOARD) {
+            titleText = editIndex >= 0 ? "编辑剪切板" : "添加剪切板";
+        } else {
+            titleText = editIndex >= 0 ? "编辑常用语" : "添加常用语";
+        }
+        title.setText(titleText);
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, Typography.SMALL);
         title.setTextColor(theme.keyText);
         title.setGravity(Gravity.CENTER);
@@ -161,7 +183,7 @@ public class AddPhraseView extends LinearLayout {
                     caretStart, sb.length(),
                     android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             int placeholderStart = sb.length();
-            sb.append("输入常用语");
+            sb.append(target == Target.CLIPBOARD ? "输入剪切板内容" : "输入常用语");
             sb.setSpan(new android.text.style.ForegroundColorSpan(
                             theme.hintLabelColor),
                     placeholderStart, sb.length(),
@@ -282,11 +304,20 @@ public class AddPhraseView extends LinearLayout {
     private void onDone() {
         String finalText = buffer.toString().trim();
         if (!finalText.isEmpty()) {
-            QuickPhraseStore store = new QuickPhraseStore(getContext());
-            if (editIndex >= 0) {
-                store.updateAt(editIndex, finalText);
+            if (target == Target.CLIPBOARD) {
+                ClipboardStore store = new ClipboardStore(getContext());
+                if (editIndex >= 0) {
+                    store.updateAt(editIndex, finalText);
+                } else {
+                    store.add(finalText);
+                }
             } else {
-                store.add(finalText);
+                QuickPhraseStore store = new QuickPhraseStore(getContext());
+                if (editIndex >= 0) {
+                    store.updateAt(editIndex, finalText);
+                } else {
+                    store.add(finalText);
+                }
             }
         }
         if (dismissListener != null) dismissListener.onDismiss();
