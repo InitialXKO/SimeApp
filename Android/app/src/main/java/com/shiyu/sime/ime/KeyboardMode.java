@@ -18,5 +18,7 @@ public enum KeyboardMode {
     /** Recent clipboard history picker (opened from the settings panel). */
     CLIPBOARD,
     /** Emoji picker (opened from the settings panel). */
-    EMOJI
+    EMOJI,
+    /** Text editing & cursor control panel (opened from settings). */
+    EDIT
 }

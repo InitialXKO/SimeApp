@@ -298,6 +298,8 @@ public class InputView extends LinearLayout implements InputKernel.StateObserver
                     kernel.switchMode(KeyboardMode.CLIPBOARD);
                 } else if (SettingsKeyboardView.PANEL_EMOJI.equals(panelKey)) {
                     kernel.switchMode(KeyboardMode.EMOJI);
+                } else if (SettingsKeyboardView.PANEL_EDIT.equals(panelKey)) {
+                    kernel.switchMode(KeyboardMode.EDIT);
                 }
             });
         }
@@ -354,7 +356,8 @@ public class InputView extends LinearLayout implements InputKernel.StateObserver
         candidatesBar.setSettingsMode(mode == KeyboardMode.SETTINGS
                 || mode == KeyboardMode.QUICK_PHRASE
                 || mode == KeyboardMode.CLIPBOARD
-                || mode == KeyboardMode.EMOJI);
+                || mode == KeyboardMode.EMOJI
+                || mode == KeyboardMode.EDIT);
         // Note: composer overlay visibility is driven by the `composing`
         // flag set by the picker panel listener, not by the kernel mode.
         // We don't touch it here so that toggling CHINESE↔ENGLISH while
@@ -416,8 +419,44 @@ public class InputView extends LinearLayout implements InputKernel.StateObserver
                                       : new com.shiyu.sime.ime.data.EmojiStore();
                 return new EmojiPanelView(ctx, store);
             }
+            case EDIT: {
+                com.shiyu.sime.ime.keyboard.EditPanelView epv = new com.shiyu.sime.ime.keyboard.EditPanelView(ctx);
+                com.shiyu.sime.SimeService svc = (ctx instanceof com.shiyu.sime.SimeService)
+                        ? (com.shiyu.sime.SimeService) ctx : null;
+                epv.setEditActionListener(new com.shiyu.sime.ime.keyboard.EditPanelView.EditActionListener() {
+                    @Override public void onMoveLeft() { sendKeyEvent(svc, android.view.KeyEvent.KEYCODE_DPAD_LEFT); }
+                    @Override public void onMoveRight() { sendKeyEvent(svc, android.view.KeyEvent.KEYCODE_DPAD_RIGHT); }
+                    @Override public void onMoveUp() { sendKeyEvent(svc, android.view.KeyEvent.KEYCODE_DPAD_UP); }
+                    @Override public void onMoveDown() { sendKeyEvent(svc, android.view.KeyEvent.KEYCODE_DPAD_DOWN); }
+                    @Override public void onMoveHome() { sendKeyEvent(svc, android.view.KeyEvent.KEYCODE_MOVE_HOME); }
+                    @Override public void onMoveEnd() { sendKeyEvent(svc, android.view.KeyEvent.KEYCODE_MOVE_END); }
+                    @Override public void onSelectAll() { performEditAction(svc, android.R.id.selectAll); }
+                    @Override public void onCopy() { performEditAction(svc, android.R.id.copy); }
+                    @Override public void onCut() { performEditAction(svc, android.R.id.cut); }
+                    @Override public void onPaste() { performEditAction(svc, android.R.id.paste); }
+                    @Override public void onDelete() { kernel.onKey(SimeKey.backspace()); }
+                    @Override public void onClear() { performEditAction(svc, android.R.id.selectAll); kernel.onKey(SimeKey.backspace()); }
+                });
+                return epv;
+            }
         }
         return null;
+    }
+
+    private void sendKeyEvent(com.shiyu.sime.SimeService svc, int keyCode) {
+        if (svc == null) return;
+        android.view.inputmethod.InputConnection ic = svc.getCurrentInputConnection();
+        if (ic == null) return;
+        ic.sendKeyEvent(new android.view.KeyEvent(android.view.KeyEvent.ACTION_DOWN, keyCode));
+        ic.sendKeyEvent(new android.view.KeyEvent(android.view.KeyEvent.ACTION_UP, keyCode));
+    }
+
+    private void performEditAction(com.shiyu.sime.SimeService svc, int actionId) {
+        if (svc == null) return;
+        android.view.inputmethod.InputConnection ic = svc.getCurrentInputConnection();
+        if (ic != null) {
+            ic.performContextMenuAction(actionId);
+        }
     }
 
     private int dp(int v) {

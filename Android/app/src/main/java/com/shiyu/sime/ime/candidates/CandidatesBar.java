@@ -99,10 +99,13 @@ public class CandidatesBar extends FrameLayout {
      *  bar hides truncated cells while expanded, and no re-render
      *  happens on the collapse-only state change). */
     private int activeCandidateCount = 0;
+    private float candidateTextSizeSp = Typography.TITLE;
 
     public CandidatesBar(Context context) {
         super(context);
         theme = SimeTheme.fromContext(context);
+        com.shiyu.sime.ime.prefs.SimePrefs prefs = new com.shiyu.sime.ime.prefs.SimePrefs(context);
+        this.candidateTextSizeSp = prefs.getCandidateTextSizeSp();
         init();
     }
 
@@ -482,7 +485,7 @@ public class CandidatesBar extends FrameLayout {
                     tv.setBackground(null);
                     // Reset padding (buffer cell tightened it).
                     tv.setPadding(dp(12), dp(1), dp(12), dp(1));
-                    tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, Typography.TITLE);
+                    tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, candidateTextSizeSp);
                     if (englishStyle) {
                         // English candidates / predictions: no first-cell
                         // bold-accent highlight (no "selected suggestion"

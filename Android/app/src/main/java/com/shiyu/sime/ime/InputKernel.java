@@ -546,6 +546,12 @@ public class InputKernel {
     }
 
     private void handleDigit(char c) {
+        if (mode == KeyboardMode.NUMBER) {
+            englishBuffer.append(c);
+            fireSetComposingText(englishBuffer.toString());
+            refreshCalculatorCandidates();
+            return;
+        }
         if (!isChineseLike() || chineseLayout != ChineseLayout.T9) {
             fireCommitText(String.valueOf(c));
             return;
@@ -1190,6 +1196,22 @@ public class InputKernel {
         state.predicting = true;
         candidates = new ArrayList<>(results.length);
         for (DecodeResult r : results) candidates.add(r);
+        topUnits = "";
+        pinyinAlts = Collections.emptyList();
+        publish();
+    }
+
+    private void refreshCalculatorCandidates() {
+        String expr = englishBuffer.toString();
+        String result = com.shiyu.sime.ime.engine.CalculatorEngine.evaluate(expr);
+        if (result != null) {
+            List<DecodeResult> list = new ArrayList<>();
+            list.add(new DecodeResult("= " + result, "", 0));
+            list.add(new DecodeResult(result, "", 0));
+            candidates = list;
+        } else {
+            candidates = Collections.emptyList();
+        }
         topUnits = "";
         pinyinAlts = Collections.emptyList();
         publish();
