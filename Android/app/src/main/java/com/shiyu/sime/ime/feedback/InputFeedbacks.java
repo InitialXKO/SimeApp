@@ -26,6 +26,7 @@ public final class InputFeedbacks {
 
     private static volatile boolean soundEnabled = true;
     private static volatile boolean vibrationEnabled = true;
+    private static volatile int vibrationIntensity = 2; // 1=low, 2=medium, 3=high
 
     private InputFeedbacks() {}
 
@@ -35,6 +36,10 @@ public final class InputFeedbacks {
 
     public static void setVibrationEnabled(boolean enabled) {
         vibrationEnabled = enabled;
+    }
+
+    public static void setVibrationIntensity(int level) {
+        vibrationIntensity = Math.max(1, Math.min(3, level));
     }
 
     /** Fire on key DOWN. Cheap when both toggles are off. */
@@ -47,7 +52,13 @@ public final class InputFeedbacks {
             }
         }
         if (vibrationEnabled) {
-            view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+            int feedbackType = HapticFeedbackConstants.KEYBOARD_TAP;
+            if (vibrationIntensity == 1 && android.os.Build.VERSION.SDK_INT >= 27) {
+                feedbackType = HapticFeedbackConstants.TEXT_HANDLE_MOVE;
+            } else if (vibrationIntensity == 3) {
+                feedbackType = HapticFeedbackConstants.LONG_PRESS;
+            }
+            view.performHapticFeedback(feedbackType);
         }
     }
 
