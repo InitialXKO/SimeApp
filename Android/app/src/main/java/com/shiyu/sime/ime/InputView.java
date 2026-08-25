@@ -317,22 +317,24 @@ public class InputView extends LinearLayout implements InputKernel.StateObserver
                             : KeyboardMode.CLIPBOARD);
                 }
                 @Override public void onAddPhrase() {
-                    AddPhraseView.Target target = (shownMode == KeyboardMode.CLIPBOARD)
+                    KeyboardMode modeBeforeCompose = shownMode;
+                    AddPhraseView.Target target = (modeBeforeCompose == KeyboardMode.CLIPBOARD)
                             ? AddPhraseView.Target.CLIPBOARD
                             : AddPhraseView.Target.QUICK_PHRASE;
                     AddPhraseView.setSeed("", -1, target);
                     composing = true;
+                    updateComposerOverlay(true, modeBeforeCompose);
                     kernel.switchMode(KeyboardMode.CHINESE);
-                    updateComposerOverlay(true);
                 }
                 @Override public void onEditPhrase(int idx, String currentText) {
-                    AddPhraseView.Target target = (shownMode == KeyboardMode.CLIPBOARD)
+                    KeyboardMode modeBeforeCompose = shownMode;
+                    AddPhraseView.Target target = (modeBeforeCompose == KeyboardMode.CLIPBOARD)
                             ? AddPhraseView.Target.CLIPBOARD
                             : AddPhraseView.Target.QUICK_PHRASE;
                     AddPhraseView.setSeed(currentText, idx, target);
                     composing = true;
+                    updateComposerOverlay(true, modeBeforeCompose);
                     kernel.switchMode(KeyboardMode.CHINESE);
-                    updateComposerOverlay(true);
                 }
             });
         }
@@ -360,15 +362,19 @@ public class InputView extends LinearLayout implements InputKernel.StateObserver
     }
 
     private void updateComposerOverlay(boolean show) {
+        updateComposerOverlay(show, shownMode);
+    }
+
+    private void updateComposerOverlay(boolean show, KeyboardMode previousPanelMode) {
         if (show) {
             if (composerOverlay != null) return;
             composerOverlay = new AddPhraseView(getContext());
-            final KeyboardMode returnMode = (shownMode == KeyboardMode.CLIPBOARD)
+            final KeyboardMode returnMode = (previousPanelMode == KeyboardMode.CLIPBOARD)
                     ? KeyboardMode.CLIPBOARD
                     : KeyboardMode.QUICK_PHRASE;
             composerOverlay.setOnDismissListener(() -> {
                 composing = false;
-                updateComposerOverlay(false);
+                updateComposerOverlay(false, previousPanelMode);
                 kernel.switchMode(returnMode);
             });
             // Insert ABOVE the candidates bar so the order top→bottom is:
