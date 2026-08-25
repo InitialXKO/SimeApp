@@ -317,19 +317,13 @@ public class InputView extends LinearLayout implements InputKernel.StateObserver
                             : KeyboardMode.CLIPBOARD);
                 }
                 @Override public void onAddPhrase() {
-                    AddPhraseView.Target target = (shownMode == KeyboardMode.CLIPBOARD)
-                            ? AddPhraseView.Target.CLIPBOARD
-                            : AddPhraseView.Target.QUICK_PHRASE;
-                    AddPhraseView.setSeed("", -1, target);
+                    AddPhraseView.setSeed("", -1);
                     composing = true;
                     kernel.switchMode(KeyboardMode.CHINESE);
                     updateComposerOverlay(true);
                 }
                 @Override public void onEditPhrase(int idx, String currentText) {
-                    AddPhraseView.Target target = (shownMode == KeyboardMode.CLIPBOARD)
-                            ? AddPhraseView.Target.CLIPBOARD
-                            : AddPhraseView.Target.QUICK_PHRASE;
-                    AddPhraseView.setSeed(currentText, idx, target);
+                    AddPhraseView.setSeed(currentText, idx);
                     composing = true;
                     kernel.switchMode(KeyboardMode.CHINESE);
                     updateComposerOverlay(true);
@@ -363,13 +357,10 @@ public class InputView extends LinearLayout implements InputKernel.StateObserver
         if (show) {
             if (composerOverlay != null) return;
             composerOverlay = new AddPhraseView(getContext());
-            final KeyboardMode returnMode = (shownMode == KeyboardMode.CLIPBOARD)
-                    ? KeyboardMode.CLIPBOARD
-                    : KeyboardMode.QUICK_PHRASE;
             composerOverlay.setOnDismissListener(() -> {
                 composing = false;
                 updateComposerOverlay(false);
-                kernel.switchMode(returnMode);
+                kernel.switchMode(KeyboardMode.QUICK_PHRASE);
             });
             // Insert ABOVE the candidates bar so the order top→bottom is:
             //   composer (header + edit + hint) → preedit/candidates → keyboard.

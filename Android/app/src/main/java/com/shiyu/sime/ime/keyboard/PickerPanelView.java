@@ -52,9 +52,9 @@ public class PickerPanelView extends KeyboardView {
     public interface Listener {
         void onPick(String text);
         void onSwitchTab(Tab tab);
-        /** "+" tapped on QUICK_PHRASE or CLIPBOARD tab — open in-IME composer for new entry. */
+        /** "+" tapped on QUICK_PHRASE tab — open in-IME composer for new entry. */
         void onAddPhrase();
-        /** "✎" tapped on a QUICK_PHRASE or CLIPBOARD row — open composer in edit mode. */
+        /** "✎" tapped on a QUICK_PHRASE row — open composer in edit mode. */
         void onEditPhrase(int index, String currentText);
     }
 
@@ -77,26 +77,26 @@ public class PickerPanelView extends KeyboardView {
     }
 
     private void build() {
-        // Header row: tabs + action buttons (+ / clear)
+        // === Header row: tabs + "+" ===
         LinearLayout header = new LinearLayout(getContext());
         header.setOrientation(LinearLayout.HORIZONTAL);
         header.setGravity(Gravity.CENTER_VERTICAL);
-        header.setPadding(dp(12), dp(6), dp(12), dp(6));
+        header.setPadding(dp(8), dp(4), dp(8), dp(4));
         LayoutParams headerLp = new LayoutParams(
-                LayoutParams.MATCH_PARENT, dp(44));
+                LayoutParams.MATCH_PARENT, dp(40));
         addView(header, headerLp);
 
-        // Spacer left of tabs.
+        // Spacer left of tabs (balances the "+" on the right).
         View leftSpacer = new View(getContext());
         leftSpacer.setLayoutParams(new LinearLayout.LayoutParams(
                 0, 0, 1f));
         header.addView(leftSpacer);
 
-        // Tab pill: [剪切板 | 常用语].
+        // Tab pill: [剪切板 | 常用语]. Active tab uses accent color.
         LinearLayout tabPill = new LinearLayout(getContext());
         tabPill.setOrientation(LinearLayout.HORIZONTAL);
-        tabPill.setBackground(roundedRect(theme.functionKeyBackground, dp(18)));
-        tabPill.setPadding(dp(3), dp(3), dp(3), dp(3));
+        tabPill.setBackground(roundedRect(theme.functionKeyBackground, dp(16)));
+        tabPill.setPadding(dp(2), dp(2), dp(2), dp(2));
         header.addView(tabPill);
 
         tabPill.addView(buildTab("剪切板", Tab.CLIPBOARD));
@@ -107,55 +107,33 @@ public class PickerPanelView extends KeyboardView {
                 0, 0, 1f));
         header.addView(rightSpacer);
 
-        // Header right-side actions: Add button "+" + Clear button "🗑" for CLIPBOARD tab
-        if (activeTab == Tab.CLIPBOARD) {
-            TextView addBtn = new TextView(getContext());
-            addBtn.setText("+");
-            addBtn.setGravity(Gravity.CENTER);
-            addBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, Typography.TITLE);
-            addBtn.setTextColor(theme.keyText);
-            addBtn.setBackground(makeCircleBg(
-                    theme.functionKeyBackground, theme.functionKeyBackgroundPressed));
-            LinearLayout.LayoutParams addLp = new LinearLayout.LayoutParams(
-                    dp(34), dp(34));
-            addLp.rightMargin = dp(6);
-            addBtn.setLayoutParams(addLp);
-            InputFeedbacks.wireClick(addBtn, () -> {
+        // Right-side action button:
+        //   QUICK_PHRASE tab → "+"  (add a new phrase)
+        //   CLIPBOARD    tab → "🗑" (clear all clipboard history)
+        TextView actionBtn = new TextView(getContext());
+        actionBtn.setGravity(Gravity.CENTER);
+        actionBtn.setBackground(makeCircleBg(
+                theme.functionKeyBackground, theme.functionKeyBackgroundPressed));
+        if (activeTab == Tab.QUICK_PHRASE) {
+            actionBtn.setText("+");
+            actionBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, Typography.DISPLAY);
+            actionBtn.setTextColor(theme.keyText);
+            InputFeedbacks.wireClick(actionBtn, () -> {
                 if (listener != null) listener.onAddPhrase();
             });
-            header.addView(addBtn);
-
-            TextView clearBtn = new TextView(getContext());
-            clearBtn.setText("🗑");
-            clearBtn.setGravity(Gravity.CENTER);
-            clearBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, Typography.CALLOUT);
-            clearBtn.setTextColor(0xFFE53935);
-            clearBtn.setBackground(makeCircleBg(
-                    theme.functionKeyBackground, theme.functionKeyBackgroundPressed));
-            LinearLayout.LayoutParams clearLp = new LinearLayout.LayoutParams(
-                    dp(34), dp(34));
-            clearBtn.setLayoutParams(clearLp);
-            InputFeedbacks.wireClick(clearBtn, () -> {
+        } else {
+            actionBtn.setText("🗑");
+            actionBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, Typography.CALLOUT);
+            actionBtn.setTextColor(0xFFE53935);  // red 600
+            InputFeedbacks.wireClick(actionBtn, () -> {
                 clipboardStore.clearAll();
                 renderList();
             });
-            header.addView(clearBtn);
-        } else {
-            TextView addBtn = new TextView(getContext());
-            addBtn.setText("+");
-            addBtn.setGravity(Gravity.CENTER);
-            addBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, Typography.TITLE);
-            addBtn.setTextColor(theme.keyText);
-            addBtn.setBackground(makeCircleBg(
-                    theme.functionKeyBackground, theme.functionKeyBackgroundPressed));
-            LinearLayout.LayoutParams addLp = new LinearLayout.LayoutParams(
-                    dp(34), dp(34));
-            addBtn.setLayoutParams(addLp);
-            InputFeedbacks.wireClick(addBtn, () -> {
-                if (listener != null) listener.onAddPhrase();
-            });
-            header.addView(addBtn);
         }
+        LinearLayout.LayoutParams actionLp = new LinearLayout.LayoutParams(
+                dp(36), dp(36));
+        actionBtn.setLayoutParams(actionLp);
+        header.addView(actionBtn);
 
         // === Body: scrollable list ===
         ScrollView scroll = new ScrollView(getContext());
@@ -247,24 +225,26 @@ public class PickerPanelView extends KeyboardView {
         });
         row.addView(body);
 
-        // Edit button (available on both 常用语 and 剪切板 tabs).
-        TextView edit = new TextView(getContext());
-        edit.setText("✎");
-        edit.setTextSize(TypedValue.COMPLEX_UNIT_SP, Typography.TITLE);
-        edit.setTextColor(theme.accentColor);
-        edit.setGravity(Gravity.CENTER);
-        edit.setBackground(makeCircleBg(
-                theme.functionKeyBackground, theme.functionKeyBackgroundPressed));
-        LinearLayout.LayoutParams editLp = new LinearLayout.LayoutParams(
-                dp(36), dp(36));
-        editLp.leftMargin = dp(6);
-        edit.setLayoutParams(editLp);
-        edit.setClickable(true);
-        edit.setFocusable(true);
-        InputFeedbacks.wireClick(edit, () -> {
-            if (listener != null) listener.onEditPhrase(idx, text);
-        });
-        row.addView(edit);
+        // Edit button (常用语 only).
+        if (activeTab == Tab.QUICK_PHRASE) {
+            TextView edit = new TextView(getContext());
+            edit.setText("✎");
+            edit.setTextSize(TypedValue.COMPLEX_UNIT_SP, Typography.TITLE);
+            edit.setTextColor(theme.accentColor);
+            edit.setGravity(Gravity.CENTER);
+            edit.setBackground(makeCircleBg(
+                    theme.functionKeyBackground, theme.functionKeyBackgroundPressed));
+            LinearLayout.LayoutParams editLp = new LinearLayout.LayoutParams(
+                    dp(36), dp(36));
+            editLp.leftMargin = dp(6);
+            edit.setLayoutParams(editLp);
+            edit.setClickable(true);
+            edit.setFocusable(true);
+            InputFeedbacks.wireClick(edit, () -> {
+                if (listener != null) listener.onEditPhrase(idx, text);
+            });
+            row.addView(edit);
+        }
 
         // Delete button.
         TextView del = new TextView(getContext());
