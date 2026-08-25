@@ -51,6 +51,7 @@ public class SettingsKeyboardView extends KeyboardView {
     public static final String PANEL_QUICK_PHRASE = "quick_phrase";
     public static final String PANEL_CLIPBOARD = "clipboard";
     public static final String PANEL_EMOJI = "emoji";
+    public static final String PANEL_EDIT = "edit";
 
     private OnLayoutChangedListener layoutListener;
     private OnExitListener exitListener;
@@ -132,6 +133,8 @@ public class SettingsKeyboardView extends KeyboardView {
                 () -> openPanel(PANEL_QUICK_PHRASE), () -> false);
         SettingsNode clipboard = SettingsNode.toggle("剪切板",
                 () -> openPanel(PANEL_CLIPBOARD), () -> false);
+        SettingsNode edit = SettingsNode.toggle("编辑",
+                () -> openPanel(PANEL_EDIT), () -> false);
         SettingsNode sound = SettingsNode.toggle("声音",
                 () -> toggleSound(),
                 () -> prefs.getSoundEnabled());
@@ -146,7 +149,7 @@ public class SettingsKeyboardView extends KeyboardView {
                 () -> prefs.getPredictionEnabled());
         return SettingsNode.category("设置",
                 keyboardCat, emoji, clipboard, quickPhrase,
-                sound, vibration, traditional, prediction);
+                edit, sound, vibration, traditional);
     }
 
     private void push(SettingsNode node) {

@@ -114,6 +114,8 @@ public class SimeService extends InputMethodService
                 prefs.getSoundEnabled());
         com.shiyu.sime.ime.feedback.InputFeedbacks.setVibrationEnabled(
                 prefs.getVibrationEnabled());
+        com.shiyu.sime.ime.feedback.InputFeedbacks.setVibrationIntensity(
+                prefs.getVibrationIntensity());
     }
 
     @Override
