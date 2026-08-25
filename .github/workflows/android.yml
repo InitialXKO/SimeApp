@@ -7,13 +7,19 @@ on:
       - "v*"
   pull_request:
     branches: [ "main", "master" ]
+  workflow_dispatch:
 
 jobs:
   build:
+    name: Build & Test Android App
     runs-on: ubuntu-latest
 
     permissions:
       contents: write
+
+    defaults:
+      run:
+        working-directory: Android
 
     steps:
       - name: Checkout repository
@@ -26,29 +32,25 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Accept Android SDK & NDK Licenses
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses || true
 
       - name: Grant execute permission for gradlew
-        run: chmod +x Android/gradlew
+        run: chmod +x gradlew
 
       - name: Run Unit Tests
-        run: |
-          cd Android
-          ./gradlew testDebugUnitTest -PincludeHandwriting=false
+        run: ./gradlew testDebugUnitTest -PincludeHandwriting=false
 
       - name: Build Debug APK
-        run: |
-          cd Android
-          ./gradlew assembleDebug -PincludeHandwriting=false
+        run: ./gradlew assembleDebug -PincludeHandwriting=false
 
       - name: Build Release APK
-        run: |
-          cd Android
-          ./gradlew assembleRelease -PincludeHandwriting=false
+        run: ./gradlew assembleRelease -PincludeHandwriting=false
 
       - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
