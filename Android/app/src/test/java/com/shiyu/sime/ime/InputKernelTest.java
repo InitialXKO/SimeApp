@@ -211,13 +211,6 @@ public class InputKernelTest {
     }
 
     @Test
-    public void backspaceOnActiveBufferDoesNotTriggerDeleteBefore() {
-        kernel.onKey(SimeKey.letter('a'));
-        kernel.onKey(SimeKey.backspace());
-        assertEquals(0, listener.deleted);
-    }
-
-    @Test
     public void backspaceDeletesLastLetter() {
         decoder.putSentence("ni", r("你", "ni", 2));
         decoder.putSentence("n",  r("你", "ni", 1));

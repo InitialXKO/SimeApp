@@ -55,15 +55,6 @@ public class ClipboardStore {
         }
     }
 
-    public void updateAt(int index, String newText) {
-        if (newText == null || newText.isEmpty()) return;
-        List<String> all = getAll();
-        if (index >= 0 && index < all.size()) {
-            all.set(index, newText);
-            save(all);
-        }
-    }
-
     public void clearAll() {
         prefs.edit().clear().apply();
     }

@@ -196,15 +196,6 @@ public class SimeService extends InputMethodService
         }
         InputConnection ic = getCurrentInputConnection();
         if (ic == null) return;
-
-        // Check if there is selected text in the host field.
-        CharSequence selectedText = ic.getSelectedText(0);
-        if (selectedText != null && selectedText.length() > 0) {
-            // Replaces the selected text with an empty string, effectively deleting the selection.
-            ic.commitText("", 1);
-            return;
-        }
-
         // Walk back `count` grapheme clusters and delete that many UTF-16
         // chars in one call. Without this, emoji (surrogate pairs) and
         // ZWJ sequences (家庭表情等) take multiple presses to disappear.
