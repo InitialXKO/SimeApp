@@ -72,10 +72,12 @@ android {
         buildConfigField("boolean", "INCLUDE_HANDWRITING", includeHandwriting.toString())
     }
 
+    val storeFilePath = keystoreProperties.getProperty("storeFile")
+    val hasKeystore = storeFilePath != null && file(storeFilePath).exists()
+
     signingConfigs {
         create("release") {
-            val storeFilePath = keystoreProperties.getProperty("storeFile")
-            if (storeFilePath != null) {
+            if (hasKeystore) {
                 storeFile = file(storeFilePath)
                 storePassword = keystoreProperties.getProperty("storePassword")
                 keyAlias = keystoreProperties.getProperty("keyAlias")
@@ -100,7 +102,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            if (keystoreProperties.getProperty("storeFile") != null) {
+            if (hasKeystore) {
                 signingConfig = signingConfigs.getByName("release")
             }
         }
