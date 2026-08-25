@@ -20,6 +20,10 @@ public final class SimePrefs {
     private static final String KEY_TRADITIONAL_ENABLED = "traditional_enabled";
     private static final String KEY_AUTO_SPACE_ENGLISH_WORDS =
             "auto_space_english_words";
+    private static final String KEY_CANDIDATE_TEXT_SIZE_SP =
+            "candidate_text_size_sp";
+    private static final String KEY_VIBRATION_INTENSITY =
+            "vibration_intensity";
 
     private final SharedPreferences sp;
 
@@ -82,5 +86,23 @@ public final class SimePrefs {
 
     public void setAutoSpaceEnglishWords(boolean enabled) {
         sp.edit().putBoolean(KEY_AUTO_SPACE_ENGLISH_WORDS, enabled).apply();
+    }
+
+    /** Candidate font size preference in SP (default 18 sp). */
+    public int getCandidateTextSizeSp() {
+        return sp.getInt(KEY_CANDIDATE_TEXT_SIZE_SP, 18);
+    }
+
+    public void setCandidateTextSizeSp(int sizeSp) {
+        sp.edit().putInt(KEY_CANDIDATE_TEXT_SIZE_SP, sizeSp).apply();
+    }
+
+    /** Keypress vibration intensity preference (1=low, 2=medium, 3=high, default=2). */
+    public int getVibrationIntensity() {
+        return sp.getInt(KEY_VIBRATION_INTENSITY, 2);
+    }
+
+    public void setVibrationIntensity(int level) {
+        sp.edit().putInt(KEY_VIBRATION_INTENSITY, level).apply();
     }
 }

@@ -59,50 +59,50 @@ public final class SimeTheme {
         hintLabelColor               = c[14];
         keyShadowColor               = c[15];
 
-        keyCornerRadiusDp = 6;
+        keyCornerRadiusDp = 8;
         keyShadowDyDp     = 1;
         keyShadowRadiusDp = 2;
     }
 
     public static SimeTheme light() {
         return new SimeTheme(new int[]{
-            Color.parseColor("#F2F4F7"),  // barBackground
-            Color.parseColor("#1F2933"),  // barForeground
-            Color.parseColor("#E6E9EE"),  // keyboardBackground
+            Color.parseColor("#F7F9FC"),  // barBackground
+            Color.parseColor("#1C1B1F"),  // barForeground
+            Color.parseColor("#EFEFF4"),  // keyboardBackground
             Color.parseColor("#FFFFFF"),  // keyBackground
-            Color.parseColor("#CFD4DC"),  // keyBackgroundPressed
-            Color.parseColor("#1F2933"),  // keyText
-            Color.parseColor("#C9CDD4"),  // functionKeyBackground
-            Color.parseColor("#A8AEB6"),  // functionKeyBackgroundPressed
-            Color.parseColor("#3D4651"),  // keyTextFunction
-            Color.parseColor("#000000"),  // candidateText
-            Color.parseColor("#2E7D32"),  // candidateHighlight
-            Color.parseColor("#5C6470"),  // preeditText
-            Color.parseColor("#D9DCE0"),  // dividerColor
-            Color.parseColor("#2E7D32"),  // accentColor
-            Color.parseColor("#8B95A1"),  // hintLabelColor
-            Color.parseColor("#33000000"), // keyShadowColor (~20% black)
+            Color.parseColor("#D8DEF0"),  // keyBackgroundPressed
+            Color.parseColor("#1C1B1F"),  // keyText
+            Color.parseColor("#E1E6ED"),  // functionKeyBackground
+            Color.parseColor("#C5CBD6"),  // functionKeyBackgroundPressed
+            Color.parseColor("#30343D"),  // keyTextFunction
+            Color.parseColor("#1C1B1F"),  // candidateText
+            Color.parseColor("#1B6EF3"),  // candidateHighlight
+            Color.parseColor("#505A69"),  // preeditText
+            Color.parseColor("#E0E4EA"),  // dividerColor
+            Color.parseColor("#1B6EF3"),  // accentColor
+            Color.parseColor("#7A8599"),  // hintLabelColor
+            Color.parseColor("#26000000"), // keyShadowColor (~15% black)
         });
     }
 
     public static SimeTheme dark() {
         return new SimeTheme(new int[]{
-            Color.parseColor("#1A1B1F"),  // barBackground
-            Color.parseColor("#ECECEC"),  // barForeground
-            Color.parseColor("#0F1012"),  // keyboardBackground
-            Color.parseColor("#2E3036"),  // keyBackground
-            Color.parseColor("#42454D"),  // keyBackgroundPressed
-            Color.parseColor("#F2F2F2"),  // keyText
-            Color.parseColor("#1F2024"),  // functionKeyBackground
-            Color.parseColor("#34363D"),  // functionKeyBackgroundPressed
-            Color.parseColor("#B5BAC1"),  // keyTextFunction
-            Color.parseColor("#F2F2F2"),  // candidateText
-            Color.parseColor("#7FE08A"),  // candidateHighlight
-            Color.parseColor("#A0A6AE"),  // preeditText
-            Color.parseColor("#33363C"),  // dividerColor
-            Color.parseColor("#7FE08A"),  // accentColor
-            Color.parseColor("#727680"),  // hintLabelColor
-            Color.parseColor("#66000000"), // keyShadowColor (~40% black)
+            Color.parseColor("#1C1B1F"),  // barBackground
+            Color.parseColor("#E6E1E5"),  // barForeground
+            Color.parseColor("#121316"),  // keyboardBackground
+            Color.parseColor("#2B2D33"),  // keyBackground
+            Color.parseColor("#3E424B"),  // keyBackgroundPressed
+            Color.parseColor("#F2F2F7"),  // keyText
+            Color.parseColor("#202227"),  // functionKeyBackground
+            Color.parseColor("#353842"),  // functionKeyBackgroundPressed
+            Color.parseColor("#C4C7C6"),  // keyTextFunction
+            Color.parseColor("#F2F2F7"),  // candidateText
+            Color.parseColor("#5294FF"),  // candidateHighlight
+            Color.parseColor("#A2A8B5"),  // preeditText
+            Color.parseColor("#2D3038"),  // dividerColor
+            Color.parseColor("#5294FF"),  // accentColor
+            Color.parseColor("#8E94A0"),  // hintLabelColor
+            Color.parseColor("#59000000"), // keyShadowColor (~35% black)
         });
     }
 
